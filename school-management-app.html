@@ -292,6 +292,83 @@
             margin: 1rem 0;
         }
 
+        .guidance-form {
+            background: #f3e5f5;
+            border: 2px solid #9c27b0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .severity-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .severity-minor {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .severity-moderate {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .severity-severe {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .category-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .resolved-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .resolved-yes {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .resolved-no {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .guidance-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .guidance-stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            border-left: 4px solid #9c27b0;
+        }
+
+        .guidance-stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #9c27b0;
+        }
+
         .role-badge {
             padding: 0.25rem 0.75rem;
             border-radius: 12px;
@@ -497,6 +574,11 @@
             CONDUCT_COUNSELING: 'conduct_counseling',
             VIEW_COUNSELING_RECORDS: 'view_counseling_records',
 
+            // 생활지도 권한
+            MANAGE_LIFE_GUIDANCE: 'manage_life_guidance',
+            VIEW_LIFE_GUIDANCE: 'view_life_guidance',
+            VIEW_ALL_LIFE_GUIDANCE: 'view_all_life_guidance',
+
             // 관리자 권한
             MANAGE_WEEKLY_PLANS: 'manage_weekly_plans',
             VIEW_ALL_REPORTS: 'view_all_reports',
@@ -666,7 +748,10 @@
                         Permission.VIEW_COUNSELING_RECORDS,
                         Permission.MANAGE_WEEKLY_PLANS,
                         Permission.VIEW_ALL_REPORTS,
-                        Permission.CHAT_WITH_TEACHERS
+                        Permission.CHAT_WITH_TEACHERS,
+                        Permission.MANAGE_LIFE_GUIDANCE,
+                        Permission.VIEW_LIFE_GUIDANCE,
+                        Permission.VIEW_ALL_LIFE_GUIDANCE
                     ],
                     [UserRole.HOMEROOM_TEACHER]: [
                         // 담임교사는 담임 관련 권한만
@@ -680,7 +765,9 @@
                         Permission.MANAGE_CLASS,
                         Permission.VIEW_CLASS_REPORTS,
                         Permission.CONDUCT_COUNSELING,
-                        Permission.VIEW_COUNSELING_RECORDS
+                        Permission.VIEW_COUNSELING_RECORDS,
+                        Permission.MANAGE_LIFE_GUIDANCE,
+                        Permission.VIEW_LIFE_GUIDANCE
                     ]
                 };
             }
@@ -704,7 +791,8 @@
                     'Attendance': [Permission.VIEW_ATTENDANCE],
                     'Reports': [Permission.VIEW_CLASS_REPORTS],
                     'WeeklyPlans': [Permission.MANAGE_WEEKLY_PLANS],
-                    'Chat': [Permission.CHAT_WITH_TEACHERS]
+                    'Chat': [Permission.CHAT_WITH_TEACHERS],
+                    'LifeGuidance': [Permission.VIEW_LIFE_GUIDANCE]
                 };
 
                 const requiredPermissions = screenPermissions[screenName];
@@ -794,6 +882,74 @@
                     { id: '1', from: 'admin1', to: 'teacher1', message: '안녕하세요! 이번 주 계획은 어떻게 진행되고 있나요?', timestamp: new Date('2024-01-15 09:00'), sender: 'admin' },
                     { id: '2', from: 'teacher1', to: 'admin1', message: '네, 순조롭게 진행되고 있습니다. 체육대회 준비가 조금 바쁘네요.', timestamp: new Date('2024-01-15 09:05'), sender: 'teacher' },
                     { id: '3', from: 'admin1', to: 'teacher1', message: '수고하셨습니다. 필요한 지원이 있으면 말씀해 주세요.', timestamp: new Date('2024-01-15 09:10'), sender: 'admin' }
+                ];
+
+                this.lifeGuidanceRecords = [
+                    {
+                        id: '1',
+                        studentId: '2',
+                        classId: 'class-3-1',
+                        teacherId: 'teacher1',
+                        date: '2024-01-12',
+                        category: '학교폭력',
+                        severity: '경미',
+                        description: '다른 학생과 보자기 더 가져가서 다툼',
+                        action: '상담 및 반성문 작성',
+                        parentNotified: true,
+                        resolved: true
+                    },
+                    {
+                        id: '2',
+                        studentId: '8',
+                        classId: 'class-3-3',
+                        teacherId: 'teacher3',
+                        date: '2024-01-10',
+                        category: '학업방해',
+                        severity: '단순',
+                        description: '수업 중 잠자리 및 주의 산만',
+                        action: '개별 상담 및 주의 집중 안내',
+                        parentNotified: false,
+                        resolved: false
+                    },
+                    {
+                        id: '3',
+                        studentId: '14',
+                        classId: 'class-3-6',
+                        teacherId: 'teacher6',
+                        date: '2024-01-14',
+                        category: '학교규칙위반',
+                        severity: '단순',
+                        description: '복장 미비 및 휴대폰 사용',
+                        action: '주의 집중 지도 및 생활규칙 안내',
+                        parentNotified: true,
+                        resolved: true
+                    },
+                    {
+                        id: '4',
+                        studentId: '19',
+                        classId: 'class-3-9',
+                        teacherId: 'teacher9',
+                        date: '2024-01-13',
+                        category: '학교폭력',
+                        severity: '중대',
+                        description: '후배에게 지속적인 협박 및 용돈 갈취',
+                        action: '학부모 대면 상담 및 전문기관 연계',
+                        parentNotified: true,
+                        resolved: false
+                    },
+                    {
+                        id: '5',
+                        studentId: '22',
+                        classId: 'class-3-10',
+                        teacherId: 'teacher10',
+                        date: '2024-01-11',
+                        category: '학업방해',
+                        severity: '경미',
+                        description: '수업 시간 떠들기 및 장난치기',
+                        action: '개별 상담 및 역할 분담',
+                        parentNotified: false,
+                        resolved: true
+                    }
                 ];
             }
 
@@ -927,6 +1083,53 @@
                         }
 
                         resolve(newRecord);
+                    }, 500);
+                });
+            }
+
+            async getLifeGuidanceRecords(classId) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        let records = this.lifeGuidanceRecords;
+                        if (classId) {
+                            records = records.filter(r => r.classId === classId);
+                        }
+                        resolve(records);
+                    }, 500);
+                });
+            }
+
+            async addLifeGuidanceRecord(record) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const newRecord = {
+                            id: Date.now().toString(),
+                            ...record,
+                            date: record.date || new Date().toISOString().split('T')[0]
+                        };
+                        this.lifeGuidanceRecords.push(newRecord);
+                        resolve(newRecord);
+                    }, 500);
+                });
+            }
+
+            async updateLifeGuidanceRecord(recordId, updates) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const record = this.lifeGuidanceRecords.find(r => r.id === recordId);
+                        if (record) {
+                            Object.assign(record, updates);
+                        }
+                        resolve(record);
+                    }, 500);
+                });
+            }
+
+            async deleteLifeGuidanceRecord(recordId) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        this.lifeGuidanceRecords = this.lifeGuidanceRecords.filter(r => r.id !== recordId);
+                        resolve(true);
                     }, 500);
                 });
             }
@@ -1137,6 +1340,7 @@
                 { id: 'dashboard', name: '대시보드', icon: '📊' },
                 { id: 'students', name: '학생 관리', icon: '👥', permission: 'Students' },
                 { id: 'attendance', name: '출석 관리', icon: '📅', permission: 'Attendance' },
+                { id: 'life-guidance', name: '생활지도', icon: '⚖️', permission: 'LifeGuidance' },
                 { id: 'reports', name: '보고서', icon: '📋', permission: 'Reports' },
                 { id: 'weekly-plans', name: '주간계획', icon: '📅', permission: 'WeeklyPlans', adminOnly: true },
                 { id: 'chat', name: '채팅', icon: '💬', permission: 'Chat' }
@@ -1627,6 +1831,350 @@
             );
         };
 
+        // 생활지도 컴포넌트
+        const LifeGuidance = () => {
+            const { user, checkPermission } = useAuth();
+            const [records, setRecords] = useState([]);
+            const [students, setStudents] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [showAddForm, setShowAddForm] = useState(false);
+            const [newRecord, setNewRecord] = useState({
+                studentId: '',
+                category: '',
+                severity: '',
+                description: '',
+                action: '',
+                parentNotified: false
+            });
+            const [message, setMessage] = useState('');
+            const [stats, setStats] = useState({
+                total: 0,
+                resolved: 0,
+                pending: 0,
+                severe: 0
+            });
+
+            const dataService = new DataService();
+
+            useEffect(() => {
+                loadData();
+            }, []);
+
+            const loadData = async () => {
+                setLoading(true);
+                try {
+                    const [recordsData, studentsData] = await Promise.all([
+                        dataService.getLifeGuidanceRecords(user?.role === UserRole.ADMIN ? null : user?.classId),
+                        dataService.getStudents(user?.role === UserRole.ADMIN ? null : user?.classId)
+                    ]);
+
+                    // 생활지도 데이터와 학생 데이터 결합
+                    const combinedData = recordsData.map(r => {
+                        const student = studentsData.find(s => s.id === r.studentId);
+                        return { ...r, studentName: student?.name || '알 수 없음', student };
+                    });
+
+                    setRecords(combinedData);
+                    setStudents(studentsData);
+
+                    // 통계 계산
+                    const total = combinedData.length;
+                    const resolved = combinedData.filter(r => r.resolved).length;
+                    const pending = total - resolved;
+                    const severe = combinedData.filter(r => r.severity === '중대').length;
+
+                    setStats({ total, resolved, pending, severe });
+                } catch (error) {
+                    console.error('생활지도 데이터 로딩 오류:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handleAddRecord = async () => {
+                if (!newRecord.studentId || !newRecord.category || !newRecord.severity || !newRecord.description) {
+                    setMessage('모든 필수 항목을 입력해주세요.');
+                    return;
+                }
+
+                try {
+                    const student = students.find(s => s.id === newRecord.studentId);
+                    const recordToAdd = {
+                        ...newRecord,
+                        classId: student?.classId || user?.classId,
+                        teacherId: user?.id,
+                        resolved: false
+                    };
+
+                    await dataService.addLifeGuidanceRecord(recordToAdd);
+                    setMessage('생활지도 기록이 추가되었습니다.');
+                    setShowAddForm(false);
+                    setNewRecord({
+                        studentId: '',
+                        category: '',
+                        severity: '',
+                        description: '',
+                        action: '',
+                        parentNotified: false
+                    });
+                    loadData(); // 데이터 다시 로드
+                    setTimeout(() => setMessage(''), 3000);
+                } catch (error) {
+                    setMessage('기록 추가 중 오류가 발생했습니다.');
+                    console.error(error);
+                }
+            };
+
+            const handleResolveRecord = async (recordId) => {
+                try {
+                    await dataService.updateLifeGuidanceRecord(recordId, { resolved: true });
+                    setMessage('기록이 해결 완료로 업데이트되었습니다.');
+                    loadData();
+                    setTimeout(() => setMessage(''), 3000);
+                } catch (error) {
+                    setMessage('업데이트 중 오류가 발생했습니다.');
+                    console.error(error);
+                }
+            };
+
+            const getSeverityText = (severity) => {
+                const severityMap = {
+                    '단순': '단순',
+                    '경미': '경미',
+                    '중대': '중대'
+                };
+                return severityMap[severity] || severity;
+            };
+
+            const getSeverityClass = (severity) => {
+                const classMap = {
+                    '단순': 'severity-minor',
+                    '경미': 'severity-moderate',
+                    '중대': 'severity-severe'
+                };
+                return classMap[severity] || 'severity-minor';
+            };
+
+            const canManageGuidance = checkPermission(Permission.MANAGE_LIFE_GUIDANCE).allowed;
+
+            if (loading) {
+                return <div className="loading">생활지도 데이터를 불러오는 중...</div>;
+            }
+
+            return (
+                <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                        <h2 style={{ margin: 0, color: '#333' }}>
+                            생활지도 기록 {user?.role === UserRole.ADMIN ? '(전체)' : `(${user?.className})`}
+                        </h2>
+                        {canManageGuidance && (
+                            <button
+                                className="btn"
+                                style={{ width: 'auto', padding: '0.5rem 1rem', background: '#9c27b0' }}
+                                onClick={() => setShowAddForm(!showAddForm)}
+                            >
+                                + 새 기록 추가
+                            </button>
+                        )}
+                    </div>
+
+                    {/* 통계 카드 */}
+                    <div className="guidance-stats">
+                        <div className="guidance-stat-card">
+                            <div className="guidance-stat-number">{stats.total}</div>
+                            <div>전체 기록</div>
+                        </div>
+                        <div className="guidance-stat-card">
+                            <div className="guidance-stat-number">{stats.pending}</div>
+                            <div>미해결</div>
+                        </div>
+                        <div className="guidance-stat-card">
+                            <div className="guidance-stat-number">{stats.resolved}</div>
+                            <div>해결완료</div>
+                        </div>
+                        <div className="guidance-stat-card">
+                            <div className="guidance-stat-number">{stats.severe}</div>
+                            <div>중대 사안</div>
+                        </div>
+                    </div>
+
+                    {message && (
+                        <div className={message.includes('오류') ? 'error-message' : 'success-message'}>
+                            {message}
+                        </div>
+                    )}
+
+                    {/* 새 기록 추가 폼 */}
+                    {showAddForm && canManageGuidance && (
+                        <div className="guidance-form">
+                            <h4 style={{ margin: '0 0 1rem 0', color: '#9c27b0' }}>⚖️ 새 생활지도 기록</h4>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>학생 선택</label>
+                                    <select
+                                        className="form-input"
+                                        value={newRecord.studentId}
+                                        onChange={(e) => setNewRecord(prev => ({ ...prev, studentId: e.target.value }))}
+                                    >
+                                        <option value="">학생을 선택하세요</option>
+                                        {students.map(student => (
+                                            <option key={student.id} value={student.id}>
+                                                {student.name} ({student.className})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>위반 유형</label>
+                                    <select
+                                        className="form-input"
+                                        value={newRecord.category}
+                                        onChange={(e) => setNewRecord(prev => ({ ...prev, category: e.target.value }))}
+                                    >
+                                        <option value="">위반 유형 선택</option>
+                                        <option value="학교폭력">학교폭력</option>
+                                        <option value="학업방해">학업방해</option>
+                                        <option value="학교규칙위반">학교규칙위반</option>
+                                        <option value="대인관계 문제">대인관계 문제</option>
+                                        <option value="기타">기타</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>심각도</label>
+                                    <select
+                                        className="form-input"
+                                        value={newRecord.severity}
+                                        onChange={(e) => setNewRecord(prev => ({ ...prev, severity: e.target.value }))}
+                                    >
+                                        <option value="">심각도 선택</option>
+                                        <option value="단순">단순</option>
+                                        <option value="경미">경미</option>
+                                        <option value="중대">중대</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>사건 내용</label>
+                                <textarea
+                                    className="form-textarea"
+                                    value={newRecord.description}
+                                    onChange={(e) => setNewRecord(prev => ({ ...prev, description: e.target.value }))}
+                                    placeholder="사건의 자세한 내용을 입력하세요..."
+                                    rows="3"
+                                />
+                            </div>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>조치 사항</label>
+                                <textarea
+                                    className="form-textarea"
+                                    value={newRecord.action}
+                                    onChange={(e) => setNewRecord(prev => ({ ...prev, action: e.target.value }))}
+                                    placeholder="취한 조치나 예정된 조치를 입력하세요..."
+                                    rows="2"
+                                />
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                                <input
+                                    type="checkbox"
+                                    id="parentNotified"
+                                    checked={newRecord.parentNotified}
+                                    onChange={(e) => setNewRecord(prev => ({ ...prev, parentNotified: e.target.checked }))}
+                                    style={{ marginRight: '0.5rem' }}
+                                />
+                                <label htmlFor="parentNotified">학부모 연락 완료</label>
+                            </div>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <button
+                                    className="btn"
+                                    style={{ flex: 1, background: '#9c27b0' }}
+                                    onClick={handleAddRecord}
+                                >
+                                    기록 추가
+                                </button>
+                                <button
+                                    className="btn btn-secondary"
+                                    style={{ flex: 1 }}
+                                    onClick={() => setShowAddForm(false)}
+                                >
+                                    취소
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 기록 목록 */}
+                    <div className="card">
+                        <div className="card-title">생활지도 기록 목록</div>
+                        {records.length === 0 ? (
+                            <p style={{ textAlign: 'center', color: '#666', padding: '2rem' }}>아직 기록이 없습니다.</p>
+                        ) : (
+                            <div>
+                                {records.map(record => (
+                                    <div key={record.id} style={{
+                                        border: '1px solid #e0e0e0',
+                                        borderRadius: '8px',
+                                        padding: '1.5rem',
+                                        marginBottom: '1rem',
+                                        background: record.resolved ? '#f9f9f9' : 'white'
+                                    }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+                                            <div>
+                                                <h4 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>
+                                                    {record.studentName} ({record.student?.className})
+                                                </h4>
+                                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                    <span className="category-badge">{record.category}</span>
+                                                    <span className={`severity-badge ${getSeverityClass(record.severity)}`}>
+                                                        {getSeverityText(record.severity)}
+                                                    </span>
+                                                    <span className={`resolved-badge ${record.resolved ? 'resolved-yes' : 'resolved-no'}`}>
+                                                        {record.resolved ? '해결완료' : '미해결'}
+                                                    </span>
+                                                    {record.parentNotified && (
+                                                        <span style={{ background: '#e8f5e8', color: '#2e7d32', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.875rem' }}>
+                                                            학부모 연락완료
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div style={{ color: '#666', fontSize: '0.875rem' }}>{record.date}</div>
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <strong>사건 내용:</strong>
+                                            <p style={{ margin: '0.5rem 0', lineHeight: 1.5 }}>{record.description}</p>
+                                        </div>
+                                        {record.action && (
+                                            <div style={{ marginBottom: '1rem' }}>
+                                                <strong>조치 사항:</strong>
+                                                <p style={{ margin: '0.5rem 0', lineHeight: 1.5 }}>{record.action}</p>
+                                            </div>
+                                        )}
+                                        {canManageGuidance && !record.resolved && (
+                                            <div style={{ textAlign: 'right' }}>
+                                                <button
+                                                    style={{
+                                                        background: '#4caf50',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        padding: '0.5rem 1rem',
+                                                        borderRadius: '4px',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                    onClick={() => handleResolveRecord(record.id)}
+                                                >
+                                                    해결 완료
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
         // 보고서 컴포넌트 (담임교사용 - 화면에서 보기)
         const Reports = () => {
             const { user } = useAuth();
@@ -1998,6 +2546,8 @@
                         return <Students />;
                     case 'attendance':
                         return <Attendance />;
+                    case 'life-guidance':
+                        return <LifeGuidance />;
                     case 'reports':
                         return <Reports />;
                     case 'weekly-plans':
