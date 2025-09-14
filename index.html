@@ -866,22 +866,70 @@
                     { id: '22', studentId: '22', date: '2024-01-15', status: 'unexcused', reason: '무단결석' }
                 ];
 
-                this.weeklyPlans = {
-                    'week-2024-01-15': {
-                        monday: '전체 조회, 1교시 수학, 2교시 국어',
-                        tuesday: '1교시 과학, 2교시 영어, 방과후 활동',
-                        wednesday: '체육대회 준비, 3교시 음악',
-                        thursday: '1교시 미술, 2교시 도덕, 학급회의',
-                        friday: '주간 평가, 청소시간, 종례',
-                        saturday: '',
-                        sunday: ''
+                this.weeklyPlans = [
+                    {
+                        id: '1',
+                        department: '교무부',
+                        weekStart: '2024-01-15',
+                        weekEnd: '2024-01-21',
+                        createdBy: 'admin1',
+                        createdAt: '2024-01-14',
+                        plans: {
+                            monday: '전체 조회, 1교시 수학, 2교시 국어',
+                            tuesday: '1교시 과학, 2교시 영어, 방과후 활동',
+                            wednesday: '체육대회 준비, 3교시 음악',
+                            thursday: '1교시 미술, 2교시 도덕, 학급회의',
+                            friday: '주간 평가, 청소시간, 종례',
+                            saturday: '',
+                            sunday: ''
+                        }
+                    },
+                    {
+                        id: '2',
+                        department: '학생부',
+                        weekStart: '2024-01-15',
+                        weekEnd: '2024-01-21',
+                        createdBy: 'admin1',
+                        createdAt: '2024-01-14',
+                        plans: {
+                            monday: '생활지도 점검, 상담실 운영',
+                            tuesday: '학교폭력 예방 교육',
+                            wednesday: '체육대회 안전 관리',
+                            thursday: '학부모 상담 주간',
+                            friday: '주간 생활지도 결과 보고',
+                            saturday: '',
+                            sunday: ''
+                        }
+                    },
+                    {
+                        id: '3',
+                        department: '총무부',
+                        weekStart: '2024-01-15',
+                        weekEnd: '2024-01-21',
+                        createdBy: 'admin1',
+                        createdAt: '2024-01-14',
+                        plans: {
+                            monday: '전체 교직원 회의',
+                            tuesday: '예산 계획 수립',
+                            wednesday: '시설 점검 및 보수',
+                            thursday: '교육과정 회의',
+                            friday: '주간 업무 보고',
+                            saturday: '',
+                            sunday: ''
+                        }
                     }
-                };
+                ];
 
                 this.chatMessages = [
-                    { id: '1', from: 'admin1', to: 'teacher1', message: '안녕하세요! 이번 주 계획은 어떻게 진행되고 있나요?', timestamp: new Date('2024-01-15 09:00'), sender: 'admin' },
-                    { id: '2', from: 'teacher1', to: 'admin1', message: '네, 순조롭게 진행되고 있습니다. 체육대회 준비가 조금 바쁘네요.', timestamp: new Date('2024-01-15 09:05'), sender: 'teacher' },
-                    { id: '3', from: 'admin1', to: 'teacher1', message: '수고하셨습니다. 필요한 지원이 있으면 말씀해 주세요.', timestamp: new Date('2024-01-15 09:10'), sender: 'admin' }
+                    // 개별 채팅
+                    { id: '1', from: 'admin1', to: 'teacher1', message: '안녕하세요! 이번 주 계획은 어떻게 진행되고 있나요?', timestamp: new Date('2024-01-15 09:00'), sender: 'admin', type: 'individual' },
+                    { id: '2', from: 'teacher1', to: 'admin1', message: '네, 순조롭게 진행되고 있습니다. 체육대회 준비가 조금 바쁘네요.', timestamp: new Date('2024-01-15 09:05'), sender: 'teacher', type: 'individual' },
+                    { id: '3', from: 'admin1', to: 'teacher1', message: '수고하셨습니다. 필요한 지원이 있으면 말씀해 주세요.', timestamp: new Date('2024-01-15 09:10'), sender: 'admin', type: 'individual' },
+                    // 전체 채팅
+                    { id: '4', from: 'admin1', to: 'all', message: '안녕하세요! 이번 주 체육대회 준비사항을 공지드립니다. 모든 담임 선생님들의 적극적인 협조 부탁드립니다.', timestamp: new Date('2024-01-15 08:00'), sender: 'admin', type: 'group' },
+                    { id: '5', from: 'teacher2', to: 'all', message: '네, 알겠습니다. 2반도 준비 완료했습니다!', timestamp: new Date('2024-01-15 08:15'), sender: 'teacher', type: 'group' },
+                    { id: '6', from: 'teacher5', to: 'all', message: '5반도 준비 끝! 학생들이 정말 열심히 하네요.', timestamp: new Date('2024-01-15 08:20'), sender: 'teacher', type: 'group' },
+                    { id: '7', from: 'admin1', to: 'all', message: '모든 선생님들 수고하셨습니다! 내일 최종 점검이 있으니 참고해 주세요.', timestamp: new Date('2024-01-15 08:30'), sender: 'admin', type: 'group' }
                 ];
 
                 this.lifeGuidanceRecords = [
@@ -974,21 +1022,43 @@
                 });
             }
 
-            async getWeeklyPlan(weekId) {
+            async getWeeklyPlans(startDate) {
                 return new Promise((resolve) => {
                     setTimeout(() => {
-                        resolve(this.weeklyPlans[weekId] || {
-                            monday: '', tuesday: '', wednesday: '', thursday: '',
-                            friday: '', saturday: '', sunday: ''
-                        });
+                        const plans = startDate
+                            ? this.weeklyPlans.filter(p => p.weekStart === startDate)
+                            : this.weeklyPlans;
+                        resolve(plans);
                     }, 500);
                 });
             }
 
-            async saveWeeklyPlan(weekId, plan) {
+            async saveWeeklyPlan(planData) {
                 return new Promise((resolve) => {
                     setTimeout(() => {
-                        this.weeklyPlans[weekId] = plan;
+                        const existingIndex = this.weeklyPlans.findIndex(p =>
+                            p.department === planData.department && p.weekStart === planData.weekStart
+                        );
+
+                        if (existingIndex >= 0) {
+                            this.weeklyPlans[existingIndex] = { ...this.weeklyPlans[existingIndex], ...planData };
+                        } else {
+                            const newPlan = {
+                                id: Date.now().toString(),
+                                ...planData,
+                                createdAt: new Date().toISOString().split('T')[0]
+                            };
+                            this.weeklyPlans.push(newPlan);
+                        }
+                        resolve(true);
+                    }, 500);
+                });
+            }
+
+            async deleteWeeklyPlan(planId) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        this.weeklyPlans = this.weeklyPlans.filter(p => p.id !== planId);
                         resolve(true);
                     }, 500);
                 });
@@ -997,10 +1067,18 @@
             async getChatMessages(userId1, userId2) {
                 return new Promise((resolve) => {
                     setTimeout(() => {
-                        const messages = this.chatMessages.filter(m =>
-                            (m.from === userId1 && m.to === userId2) ||
-                            (m.from === userId2 && m.to === userId1)
-                        );
+                        let messages;
+                        if (userId2 === 'all') {
+                            // 전체 채팅 메시지
+                            messages = this.chatMessages.filter(m => m.type === 'group');
+                        } else {
+                            // 개별 채팅 메시지
+                            messages = this.chatMessages.filter(m =>
+                                m.type === 'individual' &&
+                                ((m.from === userId1 && m.to === userId2) ||
+                                (m.from === userId2 && m.to === userId1))
+                            );
+                        }
                         resolve(messages);
                     }, 500);
                 });
@@ -1015,7 +1093,8 @@
                             to,
                             message,
                             timestamp: new Date(),
-                            sender: from.includes('admin') ? 'admin' : 'teacher'
+                            sender: from.includes('admin') ? 'admin' : 'teacher',
+                            type: to === 'all' ? 'group' : 'individual'
                         };
                         this.chatMessages.push(newMessage);
                         resolve(newMessage);
@@ -2356,18 +2435,25 @@
             );
         };
 
-        // 주간계획 컴포넌트 (관리자 전용)
+        // 주간계획 컴포넌트 (관리자 전용 - 부서별)
         const WeeklyPlans = () => {
-            const [weeklyPlan, setWeeklyPlan] = useState({
-                monday: '', tuesday: '', wednesday: '', thursday: '',
-                friday: '', saturday: '', sunday: ''
-            });
+            const [plans, setPlans] = useState([]);
             const [loading, setLoading] = useState(true);
             const [saving, setSaving] = useState(false);
             const [message, setMessage] = useState('');
+            const [showAddForm, setShowAddForm] = useState(false);
+            const [selectedWeek, setSelectedWeek] = useState('');
+            const [newPlan, setNewPlan] = useState({
+                department: '',
+                weekStart: '',
+                weekEnd: '',
+                plans: {
+                    monday: '', tuesday: '', wednesday: '', thursday: '',
+                    friday: '', saturday: '', sunday: ''
+                }
+            });
 
             const dataService = new DataService();
-            const weekId = 'week-2024-01-15'; // 현재 주
 
             const days = [
                 { key: 'monday', label: '월요일' },
@@ -2379,15 +2465,30 @@
                 { key: 'sunday', label: '일요일' }
             ];
 
-            useEffect(() => {
-                loadWeeklyPlan();
-            }, []);
+            // 주차 계산 함수
+            const getWeekEnd = (startDate) => {
+                const start = new Date(startDate);
+                const end = new Date(start);
+                end.setDate(start.getDate() + 6);
+                return end.toISOString().split('T')[0];
+            };
 
-            const loadWeeklyPlan = async () => {
+            // 주차 문자열 생성
+            const getWeekString = (startDate) => {
+                const start = new Date(startDate);
+                const end = getWeekEnd(startDate);
+                return `${start.getMonth() + 1}/${start.getDate()} ~ ${new Date(end).getMonth() + 1}/${new Date(end).getDate()}`;
+            };
+
+            useEffect(() => {
+                loadWeeklyPlans();
+            }, [selectedWeek]);
+
+            const loadWeeklyPlans = async () => {
                 setLoading(true);
                 try {
-                    const data = await dataService.getWeeklyPlan(weekId);
-                    setWeeklyPlan(data);
+                    const data = await dataService.getWeeklyPlans(selectedWeek);
+                    setPlans(data);
                 } catch (error) {
                     console.error('주간계획 로딩 오류:', error);
                 } finally {
@@ -2395,24 +2496,68 @@
                 }
             };
 
-            const handlePlanChange = (day, value) => {
-                setWeeklyPlan(prev => ({
-                    ...prev,
-                    [day]: value
-                }));
+            const handlePlanChange = (planId, day, value) => {
+                setPlans(prev => prev.map(plan =>
+                    plan.id === planId
+                        ? { ...plan, plans: { ...plan.plans, [day]: value } }
+                        : plan
+                ));
             };
 
-            const handleSave = async () => {
+            const handleSavePlan = async (plan) => {
                 setSaving(true);
                 try {
-                    await dataService.saveWeeklyPlan(weekId, weeklyPlan);
+                    await dataService.saveWeeklyPlan({
+                        ...plan,
+                        createdBy: 'admin1'
+                    });
                     setMessage('주간계획이 저장되었습니다.');
+                    loadWeeklyPlans();
                     setTimeout(() => setMessage(''), 3000);
                 } catch (error) {
                     console.error('저장 오류:', error);
                     setMessage('저장 중 오류가 발생했습니다.');
                 } finally {
                     setSaving(false);
+                }
+            };
+
+            const handleAddNewPlan = async () => {
+                if (!newPlan.department || !newPlan.weekStart) {
+                    setMessage('부서명과 주차 시작일을 입력해주세요.');
+                    return;
+                }
+
+                const planToSave = {
+                    ...newPlan,
+                    weekEnd: getWeekEnd(newPlan.weekStart),
+                    createdBy: 'admin1'
+                };
+
+                await handleSavePlan(planToSave);
+                setShowAddForm(false);
+                setNewPlan({
+                    department: '',
+                    weekStart: '',
+                    weekEnd: '',
+                    plans: {
+                        monday: '', tuesday: '', wednesday: '', thursday: '',
+                        friday: '', saturday: '', sunday: ''
+                    }
+                });
+            };
+
+            const handleDeletePlan = async (planId) => {
+                if (confirm('정말 삭제하시겠습니까?')) {
+                    try {
+                        await dataService.deleteWeeklyPlan(planId);
+                        setMessage('주간계획이 삭제되었습니다.');
+                        loadWeeklyPlans();
+                        setTimeout(() => setMessage(''), 3000);
+                    } catch (error) {
+                        console.error('삭제 오류:', error);
+                        setMessage('삭제 중 오류가 발생했습니다.');
+                    }
                 }
             };
 
@@ -2423,15 +2568,48 @@
             return (
                 <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                        <h2 style={{ margin: 0, color: '#333' }}>주간계획 관리</h2>
+                        <div>
+                            <h2 style={{ margin: 0, color: '#333' }}>부서별 주간계획 관리</h2>
+                            <p style={{ margin: '0.25rem 0 0 0', color: '#666', fontSize: '0.9rem' }}>각 부서에서 주간 업무 계획을 작성하고 관리할 수 있습니다</p>
+                        </div>
                         <button
-                            className="btn btn-success"
-                            onClick={handleSave}
-                            disabled={saving}
-                            style={{ width: 'auto', padding: '0.5rem 1rem' }}
+                            className="btn"
+                            onClick={() => setShowAddForm(!showAddForm)}
+                            style={{ width: 'auto', padding: '0.5rem 1rem', background: '#4caf50' }}
                         >
-                            {saving ? '저장 중...' : '계획 저장'}
+                            + 새 부서 계획 추가
                         </button>
+                    </div>
+
+                    {/* 날짜 필터 */}
+                    <div className="card" style={{ background: '#f8f9fa', border: '1px solid #e9ecef' }}>
+                        <div className="card-title">주차 필터</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>주차 선택</label>
+                                <input
+                                    type="date"
+                                    className="form-input"
+                                    value={selectedWeek}
+                                    onChange={(e) => setSelectedWeek(e.target.value)}
+                                    style={{ width: '200px' }}
+                                />
+                            </div>
+                            <div style={{ marginTop: '1.5rem' }}>
+                                <button
+                                    className="btn btn-secondary"
+                                    onClick={() => setSelectedWeek('')}
+                                    style={{ padding: '0.5rem 1rem' }}
+                                >
+                                    전체 보기
+                                </button>
+                            </div>
+                        </div>
+                        {selectedWeek && (
+                            <div style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#666' }}>
+                                선택된 주차: {getWeekString(selectedWeek)}
+                            </div>
+                        )}
                     </div>
 
                     {message && (
@@ -2440,42 +2618,163 @@
                         </div>
                     )}
 
-                    <div className="card">
-                        <div className="card-title">2024년 1월 3주차 (1/15 ~ 1/21)</div>
-
-                        <div className="weekly-plan">
-                            {days.map(day => (
-                                <div key={day.key} className="day-card">
-                                    <div className="day-header">{day.label}</div>
-                                    <textarea
-                                        className="form-textarea"
-                                        value={weeklyPlan[day.key]}
-                                        onChange={(e) => handlePlanChange(day.key, e.target.value)}
-                                        placeholder={`${day.label} 계획을 입력하세요...`}
-                                        style={{
-                                            width: '100%',
-                                            minHeight: '150px',
-                                            border: 'none',
-                                            background: 'transparent',
-                                            resize: 'none',
-                                            fontSize: '0.875rem'
-                                        }}
+                    {/* 새 계획 추가 폼 */}
+                    {showAddForm && (
+                        <div className="card" style={{ background: '#e8f5e8', border: '2px solid #4caf50' }}>
+                            <div className="card-title" style={{ color: '#2e7d32' }}>📅 새 부서 계획 추가</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>부서명</label>
+                                    <input
+                                        type="text"
+                                        className="form-input"
+                                        value={newPlan.department}
+                                        onChange={(e) => setNewPlan(prev => ({ ...prev, department: e.target.value }))}
+                                        placeholder="예: 교무부, 학생부, 총무부 등"
                                     />
                                 </div>
-                            ))}
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>주차 시작일 (월요일)</label>
+                                    <input
+                                        type="date"
+                                        className="form-input"
+                                        value={newPlan.weekStart}
+                                        onChange={(e) => setNewPlan(prev => ({ ...prev, weekStart: e.target.value, weekEnd: getWeekEnd(e.target.value) }))}
+                                    />
+                                </div>
+                            </div>
+                            {newPlan.weekStart && (
+                                <div style={{ marginBottom: '1rem', fontSize: '0.9rem', color: '#666' }}>
+                                    계획 기간: {getWeekString(newPlan.weekStart)}
+                                </div>
+                            )}
+                            <div className="weekly-plan" style={{ marginBottom: '1rem' }}>
+                                {days.map(day => (
+                                    <div key={day.key} className="day-card">
+                                        <div className="day-header">{day.label}</div>
+                                        <textarea
+                                            className="form-textarea"
+                                            value={newPlan.plans[day.key]}
+                                            onChange={(e) => setNewPlan(prev => ({
+                                                ...prev,
+                                                plans: { ...prev.plans, [day.key]: e.target.value }
+                                            }))}
+                                            placeholder={`${day.label} 계획...`}
+                                            style={{
+                                                width: '100%',
+                                                minHeight: '100px',
+                                                border: 'none',
+                                                background: 'white',
+                                                resize: 'none',
+                                                fontSize: '0.875rem'
+                                            }}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <button
+                                    className="btn"
+                                    onClick={handleAddNewPlan}
+                                    disabled={saving}
+                                    style={{ flex: 1, background: '#4caf50' }}
+                                >
+                                    {saving ? '저장 중...' : '계획 저장'}
+                                </button>
+                                <button
+                                    className="btn btn-secondary"
+                                    onClick={() => setShowAddForm(false)}
+                                    style={{ flex: 1 }}
+                                >
+                                    취소
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
+                    {/* 기존 계획 목록 */}
                     <div className="card">
-                        <div className="card-title">작성 가이드</div>
-                        <div style={{ lineHeight: '1.6', color: '#666' }}>
-                            <p><strong>작성 예시:</strong></p>
-                            <p>• 09:00 - 전체 조회</p>
-                            <p>• 10:00 - 1교시 수학</p>
-                            <p>• 11:00 - 2교시 국어</p>
-                            <p>• 14:00 - 방과후 활동</p>
-                            <p>• 15:00 - 청소 및 종례</p>
-                        </div>
+                        <div className="card-title">부서별 주간계획 목록 ({plans.length}건)</div>
+                        {plans.length === 0 ? (
+                            <p style={{ textAlign: 'center', color: '#666', padding: '2rem' }}>
+                                {selectedWeek ? '선택한 주차에 계획이 없습니다.' : '아직 작성된 계획이 없습니다.'}
+                            </p>
+                        ) : (
+                            plans.map(plan => (
+                                <div key={plan.id} style={{
+                                    border: '1px solid #e0e0e0',
+                                    borderRadius: '8px',
+                                    margin: '1rem 0',
+                                    background: 'white'
+                                }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        padding: '1rem 1.5rem',
+                                        borderBottom: '1px solid #e0e0e0',
+                                        background: '#f8f9fa'
+                                    }}>
+                                        <div>
+                                            <h3 style={{ margin: 0, color: '#333' }}>{plan.department}</h3>
+                                            <p style={{ margin: '0.25rem 0 0 0', color: '#666', fontSize: '0.9rem' }}>
+                                                {getWeekString(plan.weekStart)} | 작성일: {plan.createdAt}
+                                            </p>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <button
+                                                onClick={() => handleSavePlan(plan)}
+                                                disabled={saving}
+                                                style={{
+                                                    background: '#1976d2',
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    padding: '0.5rem 1rem',
+                                                    borderRadius: '4px',
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                저장
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeletePlan(plan.id)}
+                                                style={{
+                                                    background: '#f44336',
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    padding: '0.5rem 1rem',
+                                                    borderRadius: '4px',
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                삭제
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="weekly-plan" style={{ padding: '1rem' }}>
+                                        {days.map(day => (
+                                            <div key={day.key} className="day-card">
+                                                <div className="day-header">{day.label}</div>
+                                                <textarea
+                                                    className="form-textarea"
+                                                    value={plan.plans[day.key]}
+                                                    onChange={(e) => handlePlanChange(plan.id, day.key, e.target.value)}
+                                                    placeholder={`${day.label} 계획...`}
+                                                    style={{
+                                                        width: '100%',
+                                                        minHeight: '120px',
+                                                        border: '1px solid #e0e0e0',
+                                                        background: 'white',
+                                                        resize: 'vertical',
+                                                        fontSize: '0.875rem'
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             );
@@ -2506,9 +2805,14 @@
                 setLoading(true);
                 try {
                     const data = await dataService.getHomeroomTeachers();
-                    setTeachers(data);
-                    if (data.length > 0) {
-                        setSelectedTeacher(data[0]);
+                    // 전체 채팅 옵션 추가
+                    const teachersWithAll = [
+                        { id: 'all', name: '전체 채팅', className: '모든 담임교사' },
+                        ...data
+                    ];
+                    setTeachers(teachersWithAll);
+                    if (teachersWithAll.length > 0) {
+                        setSelectedTeacher(teachersWithAll[0]); // 기본으로 전체 채팅 선택
                     }
                 } catch (error) {
                     console.error('교사 목록 로딩 오류:', error);
@@ -2565,7 +2869,7 @@
                         {user?.role === UserRole.ADMIN && (
                             <div style={{ width: '300px' }}>
                                 <div className="card">
-                                    <div className="card-title">담임교사 목록</div>
+                                    <div className="card-title">채팅 대상</div>
                                     {teachers.map(teacher => (
                                         <div
                                             key={teacher.id}
@@ -2575,11 +2879,30 @@
                                                 background: selectedTeacher?.id === teacher.id ? '#e3f2fd' : '#f5f5f5',
                                                 borderRadius: '8px',
                                                 cursor: 'pointer',
-                                                border: selectedTeacher?.id === teacher.id ? '2px solid #1976d2' : '2px solid transparent'
+                                                border: selectedTeacher?.id === teacher.id ? '2px solid #1976d2' : '2px solid transparent',
+                                                position: 'relative'
                                             }}
                                             onClick={() => setSelectedTeacher(teacher)}
                                         >
-                                            <div style={{ fontWeight: '600' }}>{teacher.name}</div>
+                                            {teacher.id === 'all' && (
+                                                <div style={{
+                                                    position: 'absolute',
+                                                    top: '5px',
+                                                    right: '10px',
+                                                    background: '#4caf50',
+                                                    color: 'white',
+                                                    borderRadius: '12px',
+                                                    padding: '2px 6px',
+                                                    fontSize: '0.7rem',
+                                                    fontWeight: '600'
+                                                }}>
+                                                    GROUP
+                                                </div>
+                                            )}
+                                            <div style={{ fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                {teacher.id === 'all' ? '💬' : '👤'}
+                                                {teacher.name}
+                                            </div>
                                             <div style={{ fontSize: '0.875rem', color: '#666' }}>{teacher.className}</div>
                                         </div>
                                     ))}
@@ -2590,22 +2913,73 @@
                         <div style={{ flex: 1 }}>
                             <div className="card">
                                 <div className="chat-container">
-                                    <div className="chat-header">
+                                    <div className="chat-header" style={{
+                                        background: selectedTeacher?.id === 'all' ? 'linear-gradient(45deg, #4caf50, #8bc34a)' : '#f5f5f5',
+                                        color: selectedTeacher?.id === 'all' ? 'white' : '#333'
+                                    }}>
                                         {user?.role === UserRole.ADMIN
-                                            ? `${selectedTeacher?.name} (${selectedTeacher?.className})`
+                                            ? (
+                                                selectedTeacher?.id === 'all'
+                                                    ? '💬 전체 채팅방 - 모든 담임교사'
+                                                    : `👤 ${selectedTeacher?.name} (${selectedTeacher?.className})`
+                                            )
                                             : '김관리 (관리자)'
                                         }
+                                        {selectedTeacher?.id === 'all' && (
+                                            <div style={{ fontSize: '0.8rem', opacity: 0.9, marginTop: '2px' }}>
+                                                모든 담임교사가 참여하는 단체 채팅방입니다
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="chat-messages">
-                                        {messages.map(message => (
-                                            <div
-                                                key={message.id}
-                                                className={`chat-message ${message.from === user.id ? 'own' : 'other'}`}
-                                            >
-                                                {message.message}
-                                            </div>
-                                        ))}
+                                        {messages.map(message => {
+                                            const isOwn = message.from === user.id;
+                                            const senderName = isOwn
+                                                ? user?.name
+                                                : (message.from === 'admin1' ? '김관리' : teachers.find(t => t.id === message.from)?.name || '알 수 없음');
+
+                                            return (
+                                                <div key={message.id} style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    alignItems: isOwn ? 'flex-end' : 'flex-start',
+                                                    marginBottom: '1rem'
+                                                }}>
+                                                    {selectedTeacher?.id === 'all' && !isOwn && (
+                                                        <div style={{
+                                                            fontSize: '0.75rem',
+                                                            color: '#666',
+                                                            marginBottom: '2px',
+                                                            fontWeight: '600'
+                                                        }}>
+                                                            {senderName} • {message.timestamp.toLocaleTimeString().slice(0, 5)}
+                                                        </div>
+                                                    )}
+                                                    <div
+                                                        className={`chat-message ${isOwn ? 'own' : 'other'}`}
+                                                        style={{
+                                                            maxWidth: selectedTeacher?.id === 'all' ? '80%' : '70%',
+                                                            background: isOwn
+                                                                ? '#1976d2'
+                                                                : (selectedTeacher?.id === 'all' ? '#e8f5e9' : '#f0f0f0'),
+                                                            color: isOwn ? 'white' : '#333'
+                                                        }}
+                                                    >
+                                                        {message.message}
+                                                    </div>
+                                                    {selectedTeacher?.id !== 'all' && (
+                                                        <div style={{
+                                                            fontSize: '0.7rem',
+                                                            color: '#999',
+                                                            marginTop: '2px'
+                                                        }}>
+                                                            {message.timestamp.toLocaleTimeString().slice(0, 5)}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                         {messages.length === 0 && (
                                             <div style={{ textAlign: 'center', color: '#666' }}>
                                                 아직 대화가 없습니다. 첫 메시지를 보내보세요!
@@ -2619,7 +2993,11 @@
                                             value={newMessage}
                                             onChange={(e) => setNewMessage(e.target.value)}
                                             onKeyPress={handleKeyPress}
-                                            placeholder="메시지를 입력하세요..."
+                                            placeholder={
+                                                selectedTeacher?.id === 'all'
+                                                    ? '모든 담임교사에게 메시지 전송...'
+                                                    : '메시지를 입력하세요...'
+                                            }
                                         />
                                         <button
                                             className="chat-send-btn"
