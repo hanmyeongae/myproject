@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPG to PDF Converter</title>
+
+    <!-- jsPDF 라이브러리를 CDN으로 가져오기 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        /* 전체 페이지 스타일링 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* 메인 컨테이너 스타일 */
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* 제목 스타일 */
+        .title {
+            color: #333;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        /* 파일 업로드 영역 스타일 */
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #f8f9ff;
+        }
+
+        .upload-area:hover {
+            border-color: #5a6fd8;
+            background: #f0f2ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #4c63d2;
+            background: #e8ebff;
+            transform: scale(1.02);
+        }
+
+        /* 업로드 아이콘 */
+        .upload-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .upload-hint {
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* 숨겨진 파일 입력 */
+        #fileInput {
+            display: none;
+        }
+
+        /* 버튼 스타일 */
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            min-width: 150px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 파일 정보 표시 영역 */
+        .files-info {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .file-item {
+            background: #f0f8ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .file-size {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .remove-file {
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .remove-file:hover {
+            background: #ff3838;
+        }
+
+        .files-summary {
+            background: #e8f4fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        /* 설정 패널 스타일 */
+        .settings-panel {
+            display: none;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #dee2e6;
+            text-align: left;
+        }
+
+        .settings-title {
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .setting-group {
+            margin-bottom: 20px;
+        }
+
+        .setting-label {
+            display: block;
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .setting-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .setting-slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .slider-value {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .setting-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .setting-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .setting-row .setting-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        /* PDF 편집 패널 */
+        .pdf-editor {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .page-preview {
+            display: inline-block;
+            margin: 10px;
+            position: relative;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-preview:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .page-preview.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .preview-image {
+            width: 120px;
+            height: 160px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .page-controls {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .page-control-btn {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-control-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        .editor-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .editor-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .editor-btn:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .editor-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 진행률 표시 */
+        .progress-container {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* 에러 메시지 스타일 */
+        .error-message {
+            display: none;
+            background: #ffe6e6;
+            color: #d63031;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #d63031;
+        }
+
+        /* 성공 메시지 스타일 */
+        .success-message {
+            display: none;
+            background: #e8f5e8;
+            color: #27ae60;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #27ae60;
+        }
+
+        /* 미리보기 이미지 */
+        .preview-container {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 제목 영역 -->
+        <h1 class="title">JPG to PDF 변환기</h1>
+        <p class="subtitle">여러 JPG 이미지를 하나의 PDF 파일로 변환하세요</p>
+
+        <!-- 파일 업로드 영역 -->
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">파일들을 선택하거나 여기에 드래그하세요</div>
+            <div class="upload-hint">JPG, JPEG 파일만 지원됩니다 (여러 파일 선택 가능)</div>
+        </div>
+
+        <!-- 숨겨진 파일 입력 -->
+        <input type="file" id="fileInput" accept=".jpg,.jpeg,image/jpeg" multiple>
+
+        <!-- 선택된 파일들 정보 표시 -->
+        <div class="files-info" id="filesInfo">
+            <div class="files-summary" id="filesSummary"></div>
+            <div id="filesList"></div>
+        </div>
+
+        <!-- 설정 패널 -->
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-title">PDF 생성 설정</div>
+
+            <div class="setting-group">
+                <label class="setting-label">이미지 품질 (파일 크기에 영향)</label>
+                <input type="range" class="setting-slider" id="qualitySlider" min="0.1" max="1" step="0.1" value="0.8">
+                <span class="slider-value" id="qualityValue">80%</span>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-group">
+                    <label class="setting-label">최대 너비 (px)</label>
+                    <input type="number" class="setting-input" id="maxWidth" value="1200" min="200" max="4000">
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">최대 높이 (px)</label>
+                    <input type="number" class="setting-input" id="maxHeight" value="1600" min="200" max="4000">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label class="setting-label">PDF 페이지 크기</label>
+                <select class="setting-select" id="pageSize">
+                    <option value="a4">A4 (210 × 297 mm)</option>
+                    <option value="a3">A3 (297 × 420 mm)</option>
+                    <option value="letter">Letter (216 × 279 mm)</option>
+                    <option value="legal">Legal (216 × 356 mm)</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label class="setting-label">페이지 여백 (mm)</label>
+                <input type="range" class="setting-slider" id="marginSlider" min="0" max="30" step="5" value="10">
+                <span class="slider-value" id="marginValue">10mm</span>
+            </div>
+
+            <div class="setting-group">
+                <label class="setting-label">한 PDF에 포함할 이미지 갯수</label>
+                <select class="setting-select" id="imagesPerPDF">
+                    <option value="all">모든 이미지를 한 PDF에</option>
+                    <option value="1">1개씩 별도 PDF로</option>
+                    <option value="2">2개씩 하나의 PDF로</option>
+                    <option value="3">3개씩 하나의 PDF로</option>
+                    <option value="4">4개씩 하나의 PDF로</option>
+                    <option value="5">5개씩 하나의 PDF로</option>
+                    <option value="10">10개씩 하나의 PDF로</option>
+                    <option value="custom">사용자 지정</option>
+                </select>
+            </div>
+
+            <div class="setting-group" id="customImagesGroup" style="display: none;">
+                <label class="setting-label">사용자 지정 갯수</label>
+                <input type="number" class="setting-input" id="customImagesCount" value="1" min="1" max="100">
+            </div>
+        </div>
+
+        <!-- PDF 편집 패널 -->
+        <div class="pdf-editor" id="pdfEditor">
+            <div class="settings-title">PDF 페이지 편집</div>
+            <div id="pagePreviewsContainer"></div>
+            <div class="editor-controls">
+                <button class="editor-btn" id="moveUpBtn" onclick="moveSelectedPages(-1)" disabled>위로 이동</button>
+                <button class="editor-btn" id="moveDownBtn" onclick="moveSelectedPages(1)" disabled>아래로 이동</button>
+                <button class="editor-btn" id="rotateLeftBtn" onclick="rotateSelectedPages(-90)" disabled>왼쪽 회전</button>
+                <button class="editor-btn" id="rotateRightBtn" onclick="rotateSelectedPages(90)" disabled>오른쪽 회전</button>
+                <button class="editor-btn" id="deletePageBtn" onclick="deleteSelectedPages()" disabled>페이지 삭제</button>
+            </div>
+        </div>
+
+        <!-- 진행률 표시 -->
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">변환 중...</div>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- 성공 메시지 -->
+        <div class="success-message" id="successMessage"></div>
+
+        <!-- 버튼 그룹 -->
+        <div class="button-group">
+            <button class="btn" id="settingsToggleBtn" onclick="toggleSettings()" style="display: none;">설정</button>
+            <button class="btn" id="editorToggleBtn" onclick="toggleEditor()" style="display: none;">편집</button>
+            <button class="btn" id="convertBtn" onclick="convertToPDF()" disabled>PDF로 변환</button>
+            <button class="btn" id="resetBtn" onclick="resetForm()" style="display: none;">다시 선택</button>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수들
+        let selectedFiles = []; // 선택된 파일들을 저장할 배열
+        let fileRotations = {}; // 각 파일의 회전 각도를 저장
+        let selectedPages = new Set(); // 선택된 페이지들
+        let pageImages = []; // 페이지 이미지 데이터
+
+        // DOM 요소들 가져오기
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const filesInfo = document.getElementById('filesInfo');
+        const filesSummary = document.getElementById('filesSummary');
+        const filesList = document.getElementById('filesList');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const pdfEditor = document.getElementById('pdfEditor');
+        const settingsToggleBtn = document.getElementById('settingsToggleBtn');
+        const editorToggleBtn = document.getElementById('editorToggleBtn');
+        const qualitySlider = document.getElementById('qualitySlider');
+        const qualityValue = document.getElementById('qualityValue');
+        const marginSlider = document.getElementById('marginSlider');
+        const marginValue = document.getElementById('marginValue');
+        const imagesPerPDF = document.getElementById('imagesPerPDF');
+        const customImagesGroup = document.getElementById('customImagesGroup');
+        const customImagesCount = document.getElementById('customImagesCount');
+        const convertBtn = document.getElementById('convertBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+
+        // 파일 입력 이벤트 리스너
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // 설정 슬라이더 이벤트 리스너
+        qualitySlider.addEventListener('input', function() {
+            qualityValue.textContent = Math.round(this.value * 100) + '%';
+        });
+
+        marginSlider.addEventListener('input', function() {
+            marginValue.textContent = this.value + 'mm';
+        });
+
+        // 이미지 갯수 선택 이벤트 리스너
+        imagesPerPDF.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customImagesGroup.style.display = 'block';
+            } else {
+                customImagesGroup.style.display = 'none';
+            }
+            updatePDFPreview();
+        });
+
+        customImagesCount.addEventListener('input', function() {
+            if (imagesPerPDF.value === 'custom') {
+                updatePDFPreview();
+            }
+        });
+
+        // 드래그 앤 드롭 이벤트 리스너들
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleFileDrop);
+
+        /**
+         * 드래그 오버 이벤트 처리
+         * 파일이 드래그되어 업로드 영역 위에 있을 때 시각적 효과 적용
+         */
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        /**
+         * 드래그 리브 이벤트 처리
+         * 파일이 업로드 영역을 벗어날 때 시각적 효과 제거
+         */
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        /**
+         * 파일 드롭 이벤트 처리
+         * 드래그한 파일들이 업로드 영역에 드롭되었을 때 처리
+         */
+        function handleFileDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+
+            const files = Array.from(e.dataTransfer.files);
+            if (files.length > 0) {
+                processFiles(files);
+            }
+        }
+
+        /**
+         * 파일 선택 이벤트 처리
+         * 파일 입력을 통해 파일들이 선택되었을 때 처리
+         */
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            if (files.length > 0) {
+                processFiles(files);
+            }
+        }
+
+        /**
+         * 여러 파일 처리 함수
+         * 선택된 파일들의 유효성을 검사하고 목록을 표시
+         */
+        function processFiles(files) {
+            // 이전 메시지들 숨기기
+            hideMessages();
+
+            const validFiles = [];
+            const invalidFiles = [];
+
+            // 각 파일에 대해 유효성 검사
+            files.forEach(file => {
+                // 파일 형식 검사 (JPG/JPEG만 허용)
+                if (!isValidImageFile(file)) {
+                    invalidFiles.push(`${file.name} - 지원하지 않는 형식`);
+                    return;
+                }
+
+                // 파일 크기 검사 (10MB 제한)
+                if (file.size > 10 * 1024 * 1024) {
+                    invalidFiles.push(`${file.name} - 파일 크기 초과 (10MB 제한)`);
+                    return;
+                }
+
+                // 중복 파일 검사
+                if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                    validFiles.push(file);
+                }
+            });
+
+            // 유효하지 않은 파일들에 대한 오류 메시지 표시
+            if (invalidFiles.length > 0) {
+                showError(`다음 파일들을 처리할 수 없습니다:\n${invalidFiles.join('\n')}`);
+            }
+
+            // 유효한 파일들 추가
+            if (validFiles.length > 0) {
+                selectedFiles.push(...validFiles);
+                displayFilesInfo();
+                convertBtn.disabled = false;
+                resetBtn.style.display = 'inline-block';
+                settingsToggleBtn.style.display = 'inline-block';
+                editorToggleBtn.style.display = 'inline-block';
+
+                // 페이지 미리보기 생성
+                generatePagePreviews();
+                updatePDFPreview();
+
+                if (invalidFiles.length === 0) {
+                    showSuccess(`${validFiles.length}개의 파일이 추가되었습니다.`);
+                }
+            } else if (invalidFiles.length === 0) {
+                showError('선택한 파일들이 이미 추가되어 있습니다.');
+            }
+        }
+
+        /**
+         * 파일 형식 유효성 검사
+         * JPG/JPEG 파일인지 확인
+         */
+        function isValidImageFile(file) {
+            const validTypes = ['image/jpeg', 'image/jpg'];
+            const validExtensions = ['.jpg', '.jpeg'];
+
+            // MIME 타입 검사
+            if (validTypes.includes(file.type)) {
+                return true;
+            }
+
+            // 파일 확장자 검사 (MIME 타입이 없을 경우 대비)
+            const fileName = file.name.toLowerCase();
+            return validExtensions.some(ext => fileName.endsWith(ext));
+        }
+
+        /**
+         * 파일들 정보 표시 함수
+         * 선택된 파일들의 목록을 화면에 표시
+         */
+        function displayFilesInfo() {
+            if (selectedFiles.length === 0) {
+                filesInfo.style.display = 'none';
+                return;
+            }
+
+            // 전체 파일 수와 크기 표시
+            const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
+            filesSummary.textContent = `${selectedFiles.length}개 파일 선택됨 (총 ${formatFileSize(totalSize)})`;
+
+            // 각 파일 항목 생성
+            filesList.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+
+                fileItem.innerHTML = `
+                    <div class="file-details">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${formatFileSize(file.size)}</div>
+                    </div>
+                    <button class="remove-file" onclick="removeFile(${index})" title="파일 제거">×</button>
+                `;
+
+                filesList.appendChild(fileItem);
+            });
+
+            filesInfo.style.display = 'block';
+        }
+
+        /**
+         * 파일 크기 포맷팅 함수
+         * 바이트 단위를 읽기 쉬운 형태로 변환
+         */
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        /**
+         * 개별 파일 제거 함수
+         * 선택된 파일 목록에서 특정 파일을 제거
+         */
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            displayFilesInfo();
+
+            if (selectedFiles.length === 0) {
+                convertBtn.disabled = true;
+                resetBtn.style.display = 'none';
+            }
+
+            showSuccess('파일이 제거되었습니다.');
+
+            // 페이지 미리보기 업데이트
+            generatePagePreviews();
+            updatePDFPreview();
+        }
+
+        /**
+         * PDF 미리보기 업데이트 함수
+         * 선택된 설정에 따라 몇 개의 PDF가 생성될지 표시
+         */
+        function updatePDFPreview() {
+            if (selectedFiles.length === 0) return;
+
+            const imagesPerPDFValue = imagesPerPDF.value;
+            let imagesCount;
+
+            if (imagesPerPDFValue === 'all') {
+                imagesCount = selectedFiles.length;
+            } else if (imagesPerPDFValue === 'custom') {
+                imagesCount = parseInt(customImagesCount.value) || 1;
+            } else {
+                imagesCount = parseInt(imagesPerPDFValue);
+            }
+
+            const totalPDFs = Math.ceil(selectedFiles.length / imagesCount);
+            const originalSummary = `${selectedFiles.length}개 파일 선택됨 (총 ${formatFileSize(selectedFiles.reduce((sum, file) => sum + file.size, 0))})`;
+
+            if (totalPDFs > 1) {
+                filesSummary.textContent = `${originalSummary} → ${totalPDFs}개의 PDF 파일 생성 예정`;
+            } else {
+                filesSummary.textContent = `${originalSummary} → 1개의 PDF 파일 생성 예정`;
+            }
+        }
+
+        /**
+         * PDF 변환 메인 함수
+         * 선택된 여러 JPG 이미지들을 설정에 따라 다수의 PDF로 변환하고 다운로드
+         */
+        function convertToPDF() {
+            if (selectedFiles.length === 0) {
+                showError('변환할 파일을 선택해주세요.');
+                return;
+            }
+
+            // 진행률 표시 시작
+            showProgress();
+
+            // 한 PDF에 들어갈 이미지 갯수 결정
+            const imagesPerPDFValue = imagesPerPDF.value;
+            let imagesCount;
+
+            if (imagesPerPDFValue === 'all') {
+                imagesCount = selectedFiles.length;
+            } else if (imagesPerPDFValue === 'custom') {
+                imagesCount = parseInt(customImagesCount.value) || 1;
+            } else {
+                imagesCount = parseInt(imagesPerPDFValue);
+            }
+
+            // PDF 그룹 나누기
+            const pdfGroups = [];
+            for (let i = 0; i < selectedFiles.length; i += imagesCount) {
+                pdfGroups.push(selectedFiles.slice(i, i + imagesCount));
+            }
+
+            const totalPDFs = pdfGroups.length;
+            let completedPDFs = 0;
+            const pdfResults = [];
+
+            // 각 PDF 그룹을 처리
+            function processNextPDF() {
+                if (completedPDFs >= totalPDFs) {
+                    // 모든 PDF 생성 완료
+                    completeAllPDFs(pdfResults);
+                    return;
+                }
+
+                const currentGroup = pdfGroups[completedPDFs];
+                const pdfProgress = Math.floor((completedPDFs / totalPDFs) * 90);
+                updateProgress(pdfProgress, `PDF ${completedPDFs + 1}/${totalPDFs} 생성 중...`);
+
+                createSinglePDF(currentGroup, completedPDFs + 1, (pdfData, pdfName) => {
+                    pdfResults.push({ data: pdfData, name: pdfName });
+                    completedPDFs++;
+                    processNextPDF();
+                });
+            }
+
+            // 첫 번째 PDF 처리 시작
+            processNextPDF();
+        }
+
+        /**
+         * 단일 PDF 생성 함수
+         */
+        function createSinglePDF(filesGroup, pdfNumber, callback) {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            let processedCount = 0;
+            const totalFiles = filesGroup.length;
+
+            // 첫 번째 페이지는 자동으로 생성되므로 제거 플래그
+            let isFirstPage = true;
+
+            // 이미지 압축 함수
+            function compressImage(canvas, quality) {
+                return canvas.toDataURL('image/jpeg', quality);
+            }
+
+            // 이미지 리사이즈 함수
+            function resizeImage(img, maxWidth, maxHeight, originalIndex) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                let { width, height } = img;
+
+                // 최대 크기에 맞게 비율 조정
+                if (width > maxWidth || height > maxHeight) {
+                    const ratio = Math.min(maxWidth / width, maxHeight / height);
+                    width = width * ratio;
+                    height = height * ratio;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                // 회전 적용 - 원본 파일 인덱스 사용
+                const rotation = fileRotations[originalIndex] || 0;
+
+                if (rotation !== 0) {
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    ctx.translate(centerX, centerY);
+                    ctx.rotate((rotation * Math.PI) / 180);
+                    ctx.translate(-centerX, -centerY);
+                }
+
+                ctx.drawImage(img, 0, 0, width, height);
+                return canvas;
+            }
+
+            // 각 파일을 순차적으로 처리
+            function processNextFile() {
+                if (processedCount >= totalFiles) {
+                    // 모든 파일 처리 완료
+                    completeSinglePDF();
+                    return;
+                }
+
+                const file = filesGroup[processedCount];
+                const originalIndex = selectedFiles.indexOf(file);
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const img = new Image();
+
+                    img.onload = function() {
+                        try {
+                            // 이미지 리사이즈 및 압축
+                            const maxWidth = parseInt(document.getElementById('maxWidth').value);
+                            const maxHeight = parseInt(document.getElementById('maxHeight').value);
+                            const quality = parseFloat(qualitySlider.value);
+
+                            const canvas = resizeImage(img, maxWidth, maxHeight, originalIndex);
+                            const compressedImage = compressImage(canvas, quality);
+
+                            // 캔버스 크기 사용
+                            const imgWidth = canvas.width;
+                            const imgHeight = canvas.height;
+
+                            // 페이지 크기 가져오기
+                            const pageSize = document.getElementById('pageSize').value;
+                            let pageWidth, pageHeight;
+
+                            switch(pageSize) {
+                                case 'a3':
+                                    pageWidth = 297; pageHeight = 420; break;
+                                case 'letter':
+                                    pageWidth = 216; pageHeight = 279; break;
+                                case 'legal':
+                                    pageWidth = 216; pageHeight = 356; break;
+                                default: // a4
+                                    pageWidth = 210; pageHeight = 297;
+                            }
+
+                            const margin = parseInt(marginSlider.value);
+
+                            // 사용 가능한 영역
+                            const availableWidth = pageWidth - (margin * 2);
+                            const availableHeight = pageHeight - (margin * 2);
+
+                            // 이미지를 페이지에 맞게 크기 조정
+                            let finalWidth, finalHeight;
+                            const imgRatio = imgWidth / imgHeight;
+                            const availableRatio = availableWidth / availableHeight;
+
+                            if (imgRatio > availableRatio) {
+                                // 이미지가 더 넓음 - 너비 기준으로 조정
+                                finalWidth = availableWidth;
+                                finalHeight = availableWidth / imgRatio;
+                            } else {
+                                // 이미지가 더 높음 - 높이 기준으로 조정
+                                finalHeight = availableHeight;
+                                finalWidth = availableHeight * imgRatio;
+                            }
+
+                            // 중앙 정렬을 위한 위치 계산
+                            const x = margin + (availableWidth - finalWidth) / 2;
+                            const y = margin + (availableHeight - finalHeight) / 2;
+
+                            // 첫 번째 페이지가 아니면 새 페이지 추가
+                            if (!isFirstPage) {
+                                pdf.addPage();
+                            } else {
+                                isFirstPage = false;
+                            }
+
+                            // 압축된 이미지를 PDF에 추가
+                            pdf.addImage(compressedImage, 'JPEG', x, y, finalWidth, finalHeight);
+
+                            processedCount++;
+                            processNextFile();
+
+                        } catch (error) {
+                            console.error('이미지 처리 오류:', error);
+                            hideProgress();
+                            showError(`${file.name} 처리 중 오류가 발생했습니다.`);
+                        }
+                    };
+
+                    img.onerror = function() {
+                        console.error('이미지 로드 오류:', file.name);
+                        hideProgress();
+                        showError(`${file.name} 파일을 읽을 수 없습니다.`);
+                    };
+
+                    img.src = e.target.result;
+                };
+
+                reader.onerror = function() {
+                    console.error('파일 읽기 오류:', file.name);
+                    hideProgress();
+                    showError(`${file.name} 파일을 읽는 중 오류가 발생했습니다.`);
+                };
+
+                reader.readAsDataURL(file);
+            }
+
+            // 단일 PDF 생성 완료 처리
+            function completeSinglePDF() {
+                try {
+                    // 파일명 생성
+                    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                    let pdfFileName;
+
+                    if (pdfNumber === 1 && filesGroup.length === selectedFiles.length) {
+                        // 모든 이미지가 한 PDF에 들어갈 때
+                        pdfFileName = `converted-images-${timestamp}.pdf`;
+                    } else {
+                        // 여러 PDF로 나뉠 때
+                        pdfFileName = `converted-images-part${pdfNumber}-${timestamp}.pdf`;
+                    }
+
+                    // PDF 데이터 반환
+                    const pdfData = pdf.output('blob');
+                    callback(pdfData, pdfFileName);
+
+                } catch (error) {
+                    console.error('PDF 생성 오류:', error);
+                    hideProgress();
+                    showError(`PDF ${pdfNumber} 생성 중 오류가 발생했습니다.`);
+                }
+            }
+
+            // 첫 번째 파일부터 처리 시작
+            processNextFile();
+        }
+
+        /**
+         * 모든 PDF 생성 완료 처리
+         */
+        function completeAllPDFs(pdfResults) {
+            updateProgress(95, '다운로드 준비 중...');
+
+            try {
+                // 모든 PDF 파일 다운로드
+                pdfResults.forEach(pdf => {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(pdf.data);
+                    link.download = pdf.name;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(link.href);
+                });
+
+                updateProgress(100, '완료!');
+
+                setTimeout(() => {
+                    hideProgress();
+                    if (pdfResults.length === 1) {
+                        showSuccess(`${selectedFiles.length}개의 이미지가 ${pdfResults[0].name} 파일로 성공적으로 변환되었습니다!`);
+                    } else {
+                        showSuccess(`${selectedFiles.length}개의 이미지가 ${pdfResults.length}개의 PDF 파일로 성공적으로 변환되었습니다!`);
+                    }
+                }, 1000);
+
+            } catch (error) {
+                console.error('PDF 다운로드 오류:', error);
+                hideProgress();
+                showError('PDF 파일 다운로드 중 오류가 발생했습니다.');
+            }
+        }
+
+        /**
+         * 진행률 표시 함수
+         * 변환 진행 상황을 사용자에게 보여줌
+         */
+        function showProgress() {
+            progressContainer.style.display = 'block';
+            convertBtn.disabled = true;
+            updateProgress(10, '변환 시작...');
+        }
+
+        /**
+         * 진행률 업데이트 함수
+         * 진행률 바와 텍스트를 업데이트
+         */
+        function updateProgress(percent, text) {
+            progressFill.style.width = percent + '%';
+            progressText.textContent = text;
+        }
+
+        /**
+         * 진행률 숨김 함수
+         * 변환 완료 후 진행률 표시를 숨김
+         */
+        function hideProgress() {
+            progressContainer.style.display = 'none';
+            convertBtn.disabled = false;
+        }
+
+        /**
+         * 에러 메시지 표시 함수
+         * 오류 발생 시 사용자에게 메시지 표시
+         */
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+
+        /**
+         * 성공 메시지 표시 함수
+         * 변환 완료 시 성공 메시지 표시
+         */
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+
+        /**
+         * 메시지 숨김 함수
+         * 모든 메시지(에러, 성공)를 숨김
+         */
+        function hideMessages() {
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+        }
+
+        /**
+         * 폼 초기화 함수
+         * 모든 입력과 표시를 초기 상태로 되돌림
+         */
+        function resetForm() {
+            // 선택된 파일들 초기화
+            selectedFiles = [];
+            fileInput.value = '';
+
+            // UI 요소들 숨김
+            filesInfo.style.display = 'none';
+            hideMessages();
+            hideProgress();
+
+            // 버튼 상태 초기화
+            convertBtn.disabled = true;
+            resetBtn.style.display = 'none';
+            settingsToggleBtn.style.display = 'none';
+            editorToggleBtn.style.display = 'none';
+
+            // 패널 초기화
+            settingsPanel.style.display = 'none';
+            pdfEditor.style.display = 'none';
+
+            // 데이터 초기화
+            fileRotations = {};
+            selectedPages.clear();
+            pageImages = [];
+
+            // 업로드 영역 클래스 초기화
+            uploadArea.classList.remove('dragover');
+        }
+
+        /**
+         * 설정 패널 토글 함수
+         */
+        function toggleSettings() {
+            const isVisible = settingsPanel.style.display === 'block';
+            settingsPanel.style.display = isVisible ? 'none' : 'block';
+            settingsToggleBtn.textContent = isVisible ? '설정' : '설정 닫기';
+        }
+
+        /**
+         * PDF 편집 패널 토글 함수
+         */
+        function toggleEditor() {
+            const isVisible = pdfEditor.style.display === 'block';
+            pdfEditor.style.display = isVisible ? 'none' : 'block';
+            editorToggleBtn.textContent = isVisible ? '편집' : '편집 닫기';
+        }
+
+        /**
+         * 페이지 미리보기 생성 함수
+         */
+        function generatePagePreviews() {
+            if (selectedFiles.length === 0) {
+                return;
+            }
+
+            const container = document.getElementById('pagePreviewsContainer');
+            container.innerHTML = '';
+            pageImages = [];
+
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        pageImages[index] = e.target.result;
+
+                        const preview = document.createElement('div');
+                        preview.className = 'page-preview';
+                        preview.dataset.index = index;
+
+                        preview.innerHTML = `
+                            <img src="${e.target.result}" class="preview-image" alt="Page ${index + 1}">
+                            <div class="page-controls">
+                                <button class="page-control-btn" onclick="rotatePreview(${index}, -90)" title="왼쪽 회전">↶</button>
+                                <button class="page-control-btn" onclick="rotatePreview(${index}, 90)" title="오른쪽 회전">↷</button>
+                            </div>
+                            <div class="page-number">${index + 1}</div>
+                        `;
+
+                        preview.addEventListener('click', function(e) {
+                            if (!e.target.classList.contains('page-control-btn')) {
+                                togglePageSelection(index);
+                            }
+                        });
+
+                        container.appendChild(preview);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        /**
+         * 페이지 선택 토글 함수
+         */
+        function togglePageSelection(index) {
+            const preview = document.querySelector(`[data-index="${index}"]`);
+
+            if (selectedPages.has(index)) {
+                selectedPages.delete(index);
+                preview.classList.remove('selected');
+            } else {
+                selectedPages.add(index);
+                preview.classList.add('selected');
+            }
+
+            updateEditorButtons();
+        }
+
+        /**
+         * 편집 버튼 상태 업데이트
+         */
+        function updateEditorButtons() {
+            const hasSelection = selectedPages.size > 0;
+
+            document.getElementById('moveUpBtn').disabled = !hasSelection;
+            document.getElementById('moveDownBtn').disabled = !hasSelection;
+            document.getElementById('rotateLeftBtn').disabled = !hasSelection;
+            document.getElementById('rotateRightBtn').disabled = !hasSelection;
+            document.getElementById('deletePageBtn').disabled = !hasSelection;
+        }
+
+        /**
+         * 페이지 미리보기 회전
+         */
+        function rotatePreview(index, angle) {
+            if (!fileRotations[index]) {
+                fileRotations[index] = 0;
+            }
+
+            fileRotations[index] = (fileRotations[index] + angle) % 360;
+
+            const preview = document.querySelector(`[data-index="${index}"] .preview-image`);
+            preview.style.transform = `rotate(${fileRotations[index]}deg)`;
+        }
+
+        /**
+         * 선택된 페이지들 이동
+         */
+        function moveSelectedPages(direction) {
+            if (selectedPages.size === 0) return;
+
+            const indices = Array.from(selectedPages).sort((a, b) => direction > 0 ? b - a : a - b);
+            const newSelectedFiles = [...selectedFiles];
+            const newRotations = {...fileRotations};
+            const newSelectedPages = new Set();
+
+            indices.forEach(oldIndex => {
+                const newIndex = oldIndex + direction;
+
+                if (newIndex >= 0 && newIndex < selectedFiles.length) {
+                    // 파일 위치 교환
+                    [newSelectedFiles[oldIndex], newSelectedFiles[newIndex]] =
+                    [newSelectedFiles[newIndex], newSelectedFiles[oldIndex]];
+
+                    // 회전 정보 교환
+                    [newRotations[oldIndex], newRotations[newIndex]] =
+                    [newRotations[newIndex], newRotations[oldIndex]];
+
+                    // 선택 상태 업데이트
+                    newSelectedPages.add(newIndex);
+                }
+            });
+
+            selectedFiles = newSelectedFiles;
+            fileRotations = newRotations;
+            selectedPages = newSelectedPages;
+
+            displayFilesInfo();
+            generatePagePreviews();
+
+            // 선택 상태 복원
+            setTimeout(() => {
+                selectedPages.forEach(index => {
+                    const preview = document.querySelector(`[data-index="${index}"]`);
+                    if (preview) preview.classList.add('selected');
+                });
+                updateEditorButtons();
+            }, 100);
+        }
+
+        /**
+         * 선택된 페이지들 회전
+         */
+        function rotateSelectedPages(angle) {
+            selectedPages.forEach(index => {
+                rotatePreview(index, angle);
+            });
+        }
+
+        /**
+         * 선택된 페이지들 삭제
+         */
+        function deleteSelectedPages() {
+            if (selectedPages.size === 0) return;
+
+            const indicesToDelete = Array.from(selectedPages).sort((a, b) => b - a);
+
+            indicesToDelete.forEach(index => {
+                selectedFiles.splice(index, 1);
+                delete fileRotations[index];
+            });
+
+            // 회전 정보 재정렬
+            const newRotations = {};
+            Object.keys(fileRotations).forEach(key => {
+                const oldIndex = parseInt(key);
+                const deletedBefore = indicesToDelete.filter(i => i < oldIndex).length;
+                const newIndex = oldIndex - deletedBefore;
+                if (newIndex >= 0) {
+                    newRotations[newIndex] = fileRotations[oldIndex];
+                }
+            });
+            fileRotations = newRotations;
+
+            selectedPages.clear();
+
+            if (selectedFiles.length === 0) {
+                convertBtn.disabled = true;
+                resetBtn.style.display = 'none';
+                settingsToggleBtn.style.display = 'none';
+                editorToggleBtn.style.display = 'none';
+                filesInfo.style.display = 'none';
+                pdfEditor.style.display = 'none';
+            } else {
+                displayFilesInfo();
+                generatePagePreviews();
+                updatePDFPreview();
+            }
+
+            updateEditorButtons();
+            showSuccess('선택된 페이지가 삭제되었습니다.');
+        }
+    </script>
+</body>
+</html>

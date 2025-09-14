@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교사 관리 시스템 - Teacher Management System</title>
+
+    <!-- React 및 필요한 라이브러리 CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Material-UI -->
+    <script src="https://unpkg.com/@mui/material@latest/umd/material-ui.development.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f5f5f5;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #1976d2, #42a5f5);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .content-area {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .login-form {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #1976d2;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #1976d2, #42a5f5);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: linear-gradient(45deg, #1565c0, #1976d2);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .nav-item:hover {
+            background: #f0f7ff;
+            color: #1976d2;
+        }
+
+        .nav-item.active {
+            background: #e3f2fd;
+            color: #1976d2;
+            font-weight: 500;
+        }
+
+        .nav-icon {
+            margin-right: 1rem;
+            width: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1976d2;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .table th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .table tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-present {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-absent {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-late {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .role-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .role-homeroom {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .role-general {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .sidebar {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useContext, createContext } = React;
+
+        // ============================================================================
+        // 타입 및 상수 정의
+        // ============================================================================
+
+        const TeacherRole = {
+            HOMEROOM_TEACHER: 'homeroom_teacher',
+            GENERAL_TEACHER: 'general_teacher'
+        };
+
+        const Permission = {
+            VIEW_STUDENTS: 'view_students',
+            MANAGE_STUDENTS: 'manage_students',
+            EDIT_STUDENT_INFO: 'edit_student_info',
+            VIEW_GRADES: 'view_grades',
+            MANAGE_GRADES: 'manage_grades',
+            EXPORT_GRADES: 'export_grades',
+            VIEW_ATTENDANCE: 'view_attendance',
+            MANAGE_ATTENDANCE: 'manage_attendance',
+            VIEW_PARENT_INFO: 'view_parent_info',
+            CONTACT_PARENTS: 'contact_parents',
+            MANAGE_CLASS: 'manage_class',
+            VIEW_CLASS_REPORTS: 'view_class_reports',
+            CONDUCT_COUNSELING: 'conduct_counseling',
+            VIEW_COUNSELING_RECORDS: 'view_counseling_records'
+        };
+
+        // ============================================================================
+        // 서비스 클래스
+        // ============================================================================
+
+        class AuthService {
+            constructor() {
+                this.sampleUsers = [
+                    {
+                        id: 'teacher1',
+                        name: '김담임',
+                        email: 'homeroom@school.edu',
+                        role: TeacherRole.HOMEROOM_TEACHER,
+                        classId: 'class-3-1',
+                        className: '3학년 1반',
+                        profileImage: 'https://via.placeholder.com/150',
+                        createdAt: new Date('2023-01-01'),
+                        isActive: true
+                    },
+                    {
+                        id: 'teacher2',
+                        name: '이일반',
+                        email: 'general@school.edu',
+                        role: TeacherRole.GENERAL_TEACHER,
+                        subjectIds: ['math', 'science'],
+                        subjects: ['수학', '과학'],
+                        profileImage: 'https://via.placeholder.com/150',
+                        createdAt: new Date('2023-01-01'),
+                        isActive: true
+                    }
+                ];
+            }
+
+            async login(email, password) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const user = this.sampleUsers.find(u => u.email === email);
+                        resolve(user || null);
+                    }, 1000);
+                });
+            }
+
+            async logout() {
+                return new Promise((resolve) => {
+                    setTimeout(resolve, 500);
+                });
+            }
+        }
+
+        class RBACService {
+            constructor() {
+                this.rolePermissions = {
+                    [TeacherRole.HOMEROOM_TEACHER]: [
+                        Permission.VIEW_STUDENTS,
+                        Permission.MANAGE_STUDENTS,
+                        Permission.EDIT_STUDENT_INFO,
+                        Permission.VIEW_GRADES,
+                        Permission.MANAGE_GRADES,
+                        Permission.EXPORT_GRADES,
+                        Permission.VIEW_ATTENDANCE,
+                        Permission.MANAGE_ATTENDANCE,
+                        Permission.VIEW_PARENT_INFO,
+                        Permission.CONTACT_PARENTS,
+                        Permission.MANAGE_CLASS,
+                        Permission.VIEW_CLASS_REPORTS,
+                        Permission.CONDUCT_COUNSELING,
+                        Permission.VIEW_COUNSELING_RECORDS
+                    ],
+                    [TeacherRole.GENERAL_TEACHER]: [
+                        Permission.VIEW_STUDENTS,
+                        Permission.VIEW_GRADES,
+                        Permission.MANAGE_GRADES,
+                        Permission.VIEW_ATTENDANCE,
+                        Permission.CONDUCT_COUNSELING
+                    ]
+                };
+            }
+
+            checkPermission(user, permission, resource) {
+                if (!user || !user.isActive) {
+                    return { allowed: false, reason: '로그인이 필요합니다.' };
+                }
+
+                const rolePermissions = this.rolePermissions[user.role] || [];
+                if (!rolePermissions.includes(permission)) {
+                    return { allowed: false, reason: '해당 역할에 권한이 없습니다.' };
+                }
+
+                return { allowed: true };
+            }
+
+            canAccessScreen(user, screenName) {
+                const screenPermissions = {
+                    'Students': [Permission.VIEW_STUDENTS],
+                    'Grades': [Permission.VIEW_GRADES],
+                    'Attendance': [Permission.VIEW_ATTENDANCE],
+                    'Reports': [Permission.VIEW_CLASS_REPORTS]
+                };
+
+                const requiredPermissions = screenPermissions[screenName];
+                if (!requiredPermissions) return true;
+
+                return requiredPermissions.some(permission =>
+                    this.checkPermission(user, permission).allowed
+                );
+            }
+        }
+
+        class DataService {
+            constructor() {
+                this.students = [
+                    { id: '1', name: '홍길동', classId: 'class-3-1', grade: 3, studentNumber: '20230001', parentContact: '010-1234-5678' },
+                    { id: '2', name: '김영희', classId: 'class-3-1', grade: 3, studentNumber: '20230002', parentContact: '010-2345-6789' },
+                    { id: '3', name: '박철수', classId: 'class-3-1', grade: 3, studentNumber: '20230003', parentContact: '010-3456-7890' },
+                    { id: '4', name: '이민정', classId: 'class-3-1', grade: 3, studentNumber: '20230004', parentContact: '010-4567-8901' }
+                ];
+
+                this.grades = [
+                    { id: '1', studentId: '1', subjectId: 'math', subjectName: '수학', score: 85, maxScore: 100, examType: 'midterm' },
+                    { id: '2', studentId: '1', subjectId: 'science', subjectName: '과학', score: 92, maxScore: 100, examType: 'midterm' },
+                    { id: '3', studentId: '2', subjectId: 'math', subjectName: '수학', score: 78, maxScore: 100, examType: 'midterm' },
+                    { id: '4', studentId: '2', subjectId: 'science', subjectName: '과학', score: 88, maxScore: 100, examType: 'midterm' }
+                ];
+
+                this.attendance = [
+                    { id: '1', studentId: '1', date: '2024-01-15', status: 'present' },
+                    { id: '2', studentId: '2', date: '2024-01-15', status: 'present' },
+                    { id: '3', studentId: '3', date: '2024-01-15', status: 'late' },
+                    { id: '4', studentId: '4', date: '2024-01-15', status: 'absent' }
+                ];
+            }
+
+            async getStudents(classId) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const students = classId
+                            ? this.students.filter(s => s.classId === classId)
+                            : this.students;
+                        resolve(students);
+                    }, 500);
+                });
+            }
+
+            async getGrades(studentId, subjectId) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        let grades = this.grades;
+                        if (studentId) grades = grades.filter(g => g.studentId === studentId);
+                        if (subjectId) grades = grades.filter(g => g.subjectId === subjectId);
+                        resolve(grades);
+                    }, 500);
+                });
+            }
+
+            async getAttendance(classId, date) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        let attendance = this.attendance;
+                        if (date) attendance = attendance.filter(a => a.date === date);
+                        resolve(attendance);
+                    }, 500);
+                });
+            }
+        }
+
+        // ============================================================================
+        // Context
+        // ============================================================================
+
+        const AuthContext = createContext();
+
+        const AuthProvider = ({ children }) => {
+            const [user, setUser] = useState(null);
+            const [isLoading, setIsLoading] = useState(false);
+
+            const authService = new AuthService();
+            const rbacService = new RBACService();
+
+            const login = async (email, password) => {
+                setIsLoading(true);
+                try {
+                    const userData = await authService.login(email, password);
+                    if (userData) {
+                        setUser(userData);
+                        localStorage.setItem('user', JSON.stringify(userData));
+                        return true;
+                    }
+                    return false;
+                } catch (error) {
+                    console.error('로그인 오류:', error);
+                    return false;
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            const logout = async () => {
+                setUser(null);
+                localStorage.removeItem('user');
+                await authService.logout();
+            };
+
+            const checkPermission = (permission, resource) => {
+                return rbacService.checkPermission(user, permission, resource);
+            };
+
+            const canAccessScreen = (screenName) => {
+                return rbacService.canAccessScreen(user, screenName);
+            };
+
+            useEffect(() => {
+                const storedUser = localStorage.getItem('user');
+                if (storedUser) {
+                    setUser(JSON.parse(storedUser));
+                }
+            }, []);
+
+            return (
+                <AuthContext.Provider value={{
+                    user,
+                    isLoading,
+                    login,
+                    logout,
+                    checkPermission,
+                    canAccessScreen,
+                    isAuthenticated: !!user
+                }}>
+                    {children}
+                </AuthContext.Provider>
+            );
+        };
+
+        const useAuth = () => {
+            const context = useContext(AuthContext);
+            if (!context) {
+                throw new Error('useAuth must be used within AuthProvider');
+            }
+            return context;
+        };
+
+        // ============================================================================
+        // 컴포넌트들
+        // ============================================================================
+
+        // 로그인 컴포넌트
+        const LoginScreen = () => {
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+            const [error, setError] = useState('');
+            const { login, isLoading } = useAuth();
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setError('');
+
+                if (!email || !password) {
+                    setError('이메일과 비밀번호를 입력해주세요.');
+                    return;
+                }
+
+                const success = await login(email, password);
+                if (!success) {
+                    setError('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+                }
+            };
+
+            return (
+                <div className="login-container">
+                    <form className="login-form" onSubmit={handleSubmit}>
+                        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                            <h1 style={{ color: '#1976d2', marginBottom: '0.5rem' }}>교사 관리 시스템</h1>
+                            <p style={{ color: '#666' }}>로그인하여 시스템을 이용해주세요</p>
+                        </div>
+
+                        {error && (
+                            <div className="error-message">
+                                {error}
+                            </div>
+                        )}
+
+                        <div className="form-group">
+                            <label htmlFor="email" style={{ display: 'block', marginBottom: '0.5rem', color: '#333' }}>
+                                이메일
+                            </label>
+                            <input
+                                id="email"
+                                type="email"
+                                className="form-input"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="이메일을 입력하세요"
+                                disabled={isLoading}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="password" style={{ display: 'block', marginBottom: '0.5rem', color: '#333' }}>
+                                비밀번호
+                            </label>
+                            <input
+                                id="password"
+                                type="password"
+                                className="form-input"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="비밀번호를 입력하세요"
+                                disabled={isLoading}
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="btn"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? '로그인 중...' : '로그인'}
+                        </button>
+
+                        <div style={{ marginTop: '2rem', padding: '1rem', background: '#f5f5f5', borderRadius: '4px' }}>
+                            <p style={{ margin: 0, fontWeight: '600', marginBottom: '0.5rem' }}>테스트 계정:</p>
+                            <p style={{ margin: 0, fontSize: '0.875rem' }}>담임교사: homeroom@school.edu</p>
+                            <p style={{ margin: 0, fontSize: '0.875rem' }}>일반교사: general@school.edu</p>
+                            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.875rem', color: '#666' }}>비밀번호는 아무거나 입력하세요</p>
+                        </div>
+                    </form>
+                </div>
+            );
+        };
+
+        // 헤더 컴포넌트
+        const Header = () => {
+            const { user, logout } = useAuth();
+
+            return (
+                <div className="header">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                            <h1 style={{ margin: 0, fontSize: '1.5rem' }}>교사 관리 시스템</h1>
+                            <p style={{ margin: '0.25rem 0 0 0', opacity: 0.9 }}>
+                                {user?.name}님 ({user?.role === TeacherRole.HOMEROOM_TEACHER ? '담임교사' : '일반교사'})
+                            </p>
+                        </div>
+                        <button
+                            onClick={logout}
+                            style={{
+                                background: 'rgba(255,255,255,0.2)',
+                                color: 'white',
+                                border: '1px solid rgba(255,255,255,0.3)',
+                                padding: '0.5rem 1rem',
+                                borderRadius: '4px',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            로그아웃
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        // 사이드바 네비게이션
+        const Sidebar = ({ activeScreen, setActiveScreen }) => {
+            const { user, canAccessScreen } = useAuth();
+
+            const menuItems = [
+                { id: 'dashboard', name: '대시보드', icon: '📊' },
+                { id: 'students', name: '학생 관리', icon: '👥', permission: 'Students' },
+                { id: 'grades', name: '성적 관리', icon: '📝', permission: 'Grades' },
+                { id: 'attendance', name: '출석 관리', icon: '📅', permission: 'Attendance' },
+                { id: 'reports', name: '보고서', icon: '📋', permission: 'Reports' }
+            ];
+
+            const filteredMenuItems = menuItems.filter(item =>
+                !item.permission || canAccessScreen(item.permission)
+            );
+
+            return (
+                <div className="sidebar">
+                    <div style={{ marginBottom: '2rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                            <img
+                                src={user?.profileImage || 'https://via.placeholder.com/60'}
+                                alt="Profile"
+                                style={{
+                                    width: '60px',
+                                    height: '60px',
+                                    borderRadius: '50%',
+                                    marginRight: '1rem',
+                                    objectFit: 'cover'
+                                }}
+                            />
+                            <div>
+                                <div style={{ fontWeight: '600', color: '#333' }}>{user?.name}</div>
+                                <div style={{ fontSize: '0.875rem', color: '#666' }}>
+                                    {user?.role === TeacherRole.HOMEROOM_TEACHER ? user?.className : user?.subjects?.join(', ')}
+                                </div>
+                            </div>
+                        </div>
+                        <div className={`role-badge ${user?.role === TeacherRole.HOMEROOM_TEACHER ? 'role-homeroom' : 'role-general'}`}>
+                            {user?.role === TeacherRole.HOMEROOM_TEACHER ? '담임교사' : '일반교사'}
+                        </div>
+                    </div>
+
+                    <nav>
+                        {filteredMenuItems.map(item => (
+                            <div
+                                key={item.id}
+                                className={`nav-item ${activeScreen === item.id ? 'active' : ''}`}
+                                onClick={() => setActiveScreen(item.id)}
+                            >
+                                <span className="nav-icon">{item.icon}</span>
+                                {item.name}
+                            </div>
+                        ))}
+                    </nav>
+                </div>
+            );
+        };
+
+        // 대시보드 컴포넌트
+        const Dashboard = () => {
+            const { user } = useAuth();
+            const [stats, setStats] = useState({
+                totalStudents: 0,
+                presentToday: 0,
+                averageGrade: 0,
+                pendingTasks: 0
+            });
+
+            useEffect(() => {
+                // 실제 앱에서는 API에서 데이터를 가져옴
+                setStats({
+                    totalStudents: user?.role === TeacherRole.HOMEROOM_TEACHER ? 28 : 120,
+                    presentToday: user?.role === TeacherRole.HOMEROOM_TEACHER ? 26 : 115,
+                    averageGrade: 85.4,
+                    pendingTasks: 3
+                });
+            }, [user]);
+
+            return (
+                <div>
+                    <h2 style={{ marginBottom: '2rem', color: '#333' }}>대시보드</h2>
+
+                    <div className="stats-grid">
+                        <div className="card stat-card">
+                            <div className="stat-number">{stats.totalStudents}</div>
+                            <div className="stat-label">전체 학생 수</div>
+                        </div>
+                        <div className="card stat-card">
+                            <div className="stat-number">{stats.presentToday}</div>
+                            <div className="stat-label">오늘 출석</div>
+                        </div>
+                        <div className="card stat-card">
+                            <div className="stat-number">{stats.averageGrade}</div>
+                            <div className="stat-label">평균 성적</div>
+                        </div>
+                        <div className="card stat-card">
+                            <div className="stat-number">{stats.pendingTasks}</div>
+                            <div className="stat-label">대기 중인 업무</div>
+                        </div>
+                    </div>
+
+                    <div className="card">
+                        <div className="card-title">최근 활동</div>
+                        <div>
+                            {user?.role === TeacherRole.HOMEROOM_TEACHER ? (
+                                <div>
+                                    <p>• 3학년 1반 출석 체크 완료</p>
+                                    <p>• 홍길동 학생 성적 입력</p>
+                                    <p>• 학부모 상담 일정 3건 예정</p>
+                                </div>
+                            ) : (
+                                <div>
+                                    <p>• 수학 성적 입력 완료 (3학년 전체)</p>
+                                    <p>• 과학 수행평가 채점 중</p>
+                                    <p>• 학생 상담 2건 완료</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="card">
+                        <div className="card-title">권한 정보</div>
+                        <div>
+                            <p><strong>역할:</strong> {user?.role === TeacherRole.HOMEROOM_TEACHER ? '담임교사' : '일반교사'}</p>
+                            {user?.role === TeacherRole.HOMEROOM_TEACHER ? (
+                                <div>
+                                    <p><strong>담당 반:</strong> {user?.className}</p>
+                                    <p><strong>주요 권한:</strong> 학생 관리, 성적 관리, 출석 관리, 학부모 연락 등</p>
+                                </div>
+                            ) : (
+                                <div>
+                                    <p><strong>담당 과목:</strong> {user?.subjects?.join(', ')}</p>
+                                    <p><strong>주요 권한:</strong> 담당 과목 성적 관리, 학생 상담 등</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 학생 관리 컴포넌트
+        const Students = () => {
+            const { user, checkPermission } = useAuth();
+            const [students, setStudents] = useState([]);
+            const [loading, setLoading] = useState(true);
+
+            const dataService = new DataService();
+
+            useEffect(() => {
+                loadStudents();
+            }, []);
+
+            const loadStudents = async () => {
+                setLoading(true);
+                try {
+                    const data = await dataService.getStudents(user?.classId);
+                    setStudents(data);
+                } catch (error) {
+                    console.error('학생 데이터 로딩 오류:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const canManageStudents = checkPermission(Permission.MANAGE_STUDENTS).allowed;
+
+            if (loading) {
+                return <div className="loading">학생 데이터를 불러오는 중...</div>;
+            }
+
+            return (
+                <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                        <h2 style={{ margin: 0, color: '#333' }}>학생 관리</h2>
+                        {canManageStudents && (
+                            <button className="btn" style={{ width: 'auto', padding: '0.5rem 1rem' }}>
+                                + 학생 추가
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="card">
+                        <div className="card-title">학생 목록</div>
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>학번</th>
+                                    <th>이름</th>
+                                    <th>학급</th>
+                                    <th>학부모 연락처</th>
+                                    {canManageStudents && <th>작업</th>}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {students.map(student => (
+                                    <tr key={student.id}>
+                                        <td>{student.studentNumber}</td>
+                                        <td>{student.name}</td>
+                                        <td>{student.grade}학년</td>
+                                        <td>{student.parentContact}</td>
+                                        {canManageStudents && (
+                                            <td>
+                                                <button
+                                                    style={{
+                                                        background: '#1976d2',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        padding: '0.25rem 0.75rem',
+                                                        borderRadius: '4px',
+                                                        cursor: 'pointer',
+                                                        marginRight: '0.5rem'
+                                                    }}
+                                                >
+                                                    수정
+                                                </button>
+                                                <button
+                                                    style={{
+                                                        background: '#d32f2f',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        padding: '0.25rem 0.75rem',
+                                                        borderRadius: '4px',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    삭제
+                                                </button>
+                                            </td>
+                                        )}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+
+        // 성적 관리 컴포넌트
+        const Grades = () => {
+            const { user, checkPermission } = useAuth();
+            const [grades, setGrades] = useState([]);
+            const [loading, setLoading] = useState(true);
+
+            const dataService = new DataService();
+
+            useEffect(() => {
+                loadGrades();
+            }, []);
+
+            const loadGrades = async () => {
+                setLoading(true);
+                try {
+                    // 일반교사는 자신의 과목만 조회
+                    const subjectId = user?.role === TeacherRole.GENERAL_TEACHER ? user?.subjectIds[0] : null;
+                    const data = await dataService.getGrades(null, subjectId);
+                    setGrades(data);
+                } catch (error) {
+                    console.error('성적 데이터 로딩 오류:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const canManageGrades = checkPermission(Permission.MANAGE_GRADES).allowed;
+
+            if (loading) {
+                return <div className="loading">성적 데이터를 불러오는 중...</div>;
+            }
+
+            return (
+                <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                        <h2 style={{ margin: 0, color: '#333' }}>성적 관리</h2>
+                        {canManageGrades && (
+                            <button className="btn" style={{ width: 'auto', padding: '0.5rem 1rem' }}>
+                                + 성적 추가
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="card">
+                        <div className="card-title">성적 목록</div>
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>학생 ID</th>
+                                    <th>과목</th>
+                                    <th>점수</th>
+                                    <th>만점</th>
+                                    <th>시험 유형</th>
+                                    {canManageGrades && <th>작업</th>}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {grades.map(grade => (
+                                    <tr key={grade.id}>
+                                        <td>{grade.studentId}</td>
+                                        <td>{grade.subjectName}</td>
+                                        <td style={{ fontWeight: 'bold', color: grade.score >= 80 ? '#2e7d32' : grade.score >= 60 ? '#f57c00' : '#c62828' }}>
+                                            {grade.score}
+                                        </td>
+                                        <td>{grade.maxScore}</td>
+                                        <td>{grade.examType}</td>
+                                        {canManageGrades && (
+                                            <td>
+                                                <button
+                                                    style={{
+                                                        background: '#1976d2',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        padding: '0.25rem 0.75rem',
+                                                        borderRadius: '4px',
+                                                        cursor: 'pointer',
+                                                        marginRight: '0.5rem'
+                                                    }}
+                                                >
+                                                    수정
+                                                </button>
+                                            </td>
+                                        )}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+
+        // 출석 관리 컴포넌트
+        const Attendance = () => {
+            const { checkPermission } = useAuth();
+            const [attendance, setAttendance] = useState([]);
+            const [students, setStudents] = useState([]);
+            const [loading, setLoading] = useState(true);
+
+            const dataService = new DataService();
+
+            useEffect(() => {
+                loadData();
+            }, []);
+
+            const loadData = async () => {
+                setLoading(true);
+                try {
+                    const [attendanceData, studentsData] = await Promise.all([
+                        dataService.getAttendance(null, '2024-01-15'),
+                        dataService.getStudents()
+                    ]);
+
+                    // 출석 데이터와 학생 데이터 결합
+                    const combinedData = attendanceData.map(a => {
+                        const student = studentsData.find(s => s.id === a.studentId);
+                        return { ...a, studentName: student?.name || '알 수 없음' };
+                    });
+
+                    setAttendance(combinedData);
+                    setStudents(studentsData);
+                } catch (error) {
+                    console.error('출석 데이터 로딩 오류:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const getStatusText = (status) => {
+                const statusMap = {
+                    'present': '출석',
+                    'absent': '결석',
+                    'late': '지각',
+                    'early_leave': '조퇴'
+                };
+                return statusMap[status] || status;
+            };
+
+            const getStatusClass = (status) => {
+                const classMap = {
+                    'present': 'status-present',
+                    'absent': 'status-absent',
+                    'late': 'status-late',
+                    'early_leave': 'status-late'
+                };
+                return classMap[status] || '';
+            };
+
+            const canManageAttendance = checkPermission(Permission.MANAGE_ATTENDANCE).allowed;
+
+            if (loading) {
+                return <div className="loading">출석 데이터를 불러오는 중...</div>;
+            }
+
+            return (
+                <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                        <h2 style={{ margin: 0, color: '#333' }}>출석 관리</h2>
+                        {canManageAttendance && (
+                            <button className="btn" style={{ width: 'auto', padding: '0.5rem 1rem' }}>
+                                출석 체크
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="card">
+                        <div className="card-title">오늘의 출석 현황 (2024-01-15)</div>
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>학생명</th>
+                                    <th>출석 상태</th>
+                                    <th>날짜</th>
+                                    {canManageAttendance && <th>작업</th>}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {attendance.map(record => (
+                                    <tr key={record.id}>
+                                        <td>{record.studentName}</td>
+                                        <td>
+                                            <span className={`status-badge ${getStatusClass(record.status)}`}>
+                                                {getStatusText(record.status)}
+                                            </span>
+                                        </td>
+                                        <td>{record.date}</td>
+                                        {canManageAttendance && (
+                                            <td>
+                                                <button
+                                                    style={{
+                                                        background: '#1976d2',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        padding: '0.25rem 0.75rem',
+                                                        borderRadius: '4px',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    수정
+                                                </button>
+                                            </td>
+                                        )}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+
+        // 보고서 컴포넌트
+        const Reports = () => {
+            const { user } = useAuth();
+
+            return (
+                <div>
+                    <h2 style={{ marginBottom: '2rem', color: '#333' }}>보고서</h2>
+
+                    <div className="card">
+                        <div className="card-title">월간 보고서</div>
+                        <p>이번 달 학급 운영 현황과 성과를 확인할 수 있습니다.</p>
+                        <button className="btn" style={{ width: 'auto', padding: '0.5rem 1rem', marginTop: '1rem' }}>
+                            보고서 다운로드
+                        </button>
+                    </div>
+
+                    <div className="card">
+                        <div className="card-title">성적 분석</div>
+                        <p>학생들의 성적 분포와 개선점을 분석한 리포트입니다.</p>
+                        <button className="btn" style={{ width: 'auto', padding: '0.5rem 1rem', marginTop: '1rem' }}>
+                            분석 보고서 보기
+                        </button>
+                    </div>
+
+                    {user?.role === TeacherRole.HOMEROOM_TEACHER && (
+                        <div className="card">
+                            <div className="card-title">학부모 연락 현황</div>
+                            <p>이번 달 학부모 상담 및 연락 현황을 정리한 보고서입니다.</p>
+                            <button className="btn" style={{ width: 'auto', padding: '0.5rem 1rem', marginTop: '1rem' }}>
+                                연락 현황 보기
+                            </button>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // 메인 앱 컴포넌트
+        const MainApp = () => {
+            const [activeScreen, setActiveScreen] = useState('dashboard');
+
+            const renderScreen = () => {
+                switch (activeScreen) {
+                    case 'dashboard':
+                        return <Dashboard />;
+                    case 'students':
+                        return <Students />;
+                    case 'grades':
+                        return <Grades />;
+                    case 'attendance':
+                        return <Attendance />;
+                    case 'reports':
+                        return <Reports />;
+                    default:
+                        return <Dashboard />;
+                }
+            };
+
+            return (
+                <div className="app-container">
+                    <Header />
+                    <div className="main-content">
+                        <Sidebar activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
+                        <div className="content-area">
+                            {renderScreen()}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 앱 루트 컴포넌트
+        const App = () => {
+            const { isAuthenticated } = useAuth();
+
+            return isAuthenticated ? <MainApp /> : <LoginScreen />;
+        };
+
+        // 앱 렌더링
+        const AppRoot = () => (
+            <AuthProvider>
+                <App />
+            </AuthProvider>
+        );
+
+        ReactDOM.render(<AppRoot />, document.getElementById('root'));
+    </script>
+</body>
+</html>
