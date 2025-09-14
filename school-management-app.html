@@ -266,6 +266,32 @@
             color: #f57c00;
         }
 
+        .status-unexcused {
+            background: #ffcdd2;
+            color: #d32f2f;
+            font-weight: 600;
+        }
+
+        .unexcused-count {
+            background: #f44336;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .unexcused-form {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
         .role-badge {
             padding: 0.25rem 0.75rem;
             border-radius: 12px;
@@ -514,6 +540,94 @@
                         profileImage: 'https://via.placeholder.com/150',
                         createdAt: new Date('2023-01-01'),
                         isActive: true
+                    },
+                    {
+                        id: 'teacher3',
+                        name: '김담임',
+                        email: 'homeroom3@school.edu',
+                        role: UserRole.HOMEROOM_TEACHER,
+                        classId: 'class-3-3',
+                        className: '3학년 3반',
+                        profileImage: 'https://via.placeholder.com/150',
+                        createdAt: new Date('2023-01-01'),
+                        isActive: true
+                    },
+                    {
+                        id: 'teacher4',
+                        name: '최담임',
+                        email: 'homeroom4@school.edu',
+                        role: UserRole.HOMEROOM_TEACHER,
+                        classId: 'class-3-4',
+                        className: '3학년 4반',
+                        profileImage: 'https://via.placeholder.com/150',
+                        createdAt: new Date('2023-01-01'),
+                        isActive: true
+                    },
+                    {
+                        id: 'teacher5',
+                        name: '정담임',
+                        email: 'homeroom5@school.edu',
+                        role: UserRole.HOMEROOM_TEACHER,
+                        classId: 'class-3-5',
+                        className: '3학년 5반',
+                        profileImage: 'https://via.placeholder.com/150',
+                        createdAt: new Date('2023-01-01'),
+                        isActive: true
+                    },
+                    {
+                        id: 'teacher6',
+                        name: '강담임',
+                        email: 'homeroom6@school.edu',
+                        role: UserRole.HOMEROOM_TEACHER,
+                        classId: 'class-3-6',
+                        className: '3학년 6반',
+                        profileImage: 'https://via.placeholder.com/150',
+                        createdAt: new Date('2023-01-01'),
+                        isActive: true
+                    },
+                    {
+                        id: 'teacher7',
+                        name: '조담임',
+                        email: 'homeroom7@school.edu',
+                        role: UserRole.HOMEROOM_TEACHER,
+                        classId: 'class-3-7',
+                        className: '3학년 7반',
+                        profileImage: 'https://via.placeholder.com/150',
+                        createdAt: new Date('2023-01-01'),
+                        isActive: true
+                    },
+                    {
+                        id: 'teacher8',
+                        name: '윤담임',
+                        email: 'homeroom8@school.edu',
+                        role: UserRole.HOMEROOM_TEACHER,
+                        classId: 'class-3-8',
+                        className: '3학년 8반',
+                        profileImage: 'https://via.placeholder.com/150',
+                        createdAt: new Date('2023-01-01'),
+                        isActive: true
+                    },
+                    {
+                        id: 'teacher9',
+                        name: '한담임',
+                        email: 'homeroom9@school.edu',
+                        role: UserRole.HOMEROOM_TEACHER,
+                        classId: 'class-3-9',
+                        className: '3학년 9반',
+                        profileImage: 'https://via.placeholder.com/150',
+                        createdAt: new Date('2023-01-01'),
+                        isActive: true
+                    },
+                    {
+                        id: 'teacher10',
+                        name: '오담임',
+                        email: 'homeroom10@school.edu',
+                        role: UserRole.HOMEROOM_TEACHER,
+                        classId: 'class-3-10',
+                        className: '3학년 10반',
+                        profileImage: 'https://via.placeholder.com/150',
+                        createdAt: new Date('2023-01-01'),
+                        isActive: true
                     }
                 ];
             }
@@ -605,17 +719,63 @@
         class DataService {
             constructor() {
                 this.students = [
-                    { id: '1', name: '홍길동', classId: 'class-3-1', grade: 3, studentNumber: '20230001', parentContact: '010-1234-5678' },
-                    { id: '2', name: '김영희', classId: 'class-3-1', grade: 3, studentNumber: '20230002', parentContact: '010-2345-6789' },
-                    { id: '3', name: '박철수', classId: 'class-3-2', grade: 3, studentNumber: '20230003', parentContact: '010-3456-7890' },
-                    { id: '4', name: '이민정', classId: 'class-3-2', grade: 3, studentNumber: '20230004', parentContact: '010-4567-8901' }
+                    // 1반
+                    { id: '1', name: '홍길동', classId: 'class-3-1', className: '3학년 1반', grade: 3, studentNumber: '20230001', parentContact: '010-1234-5678', unexcusedCount: 0 },
+                    { id: '2', name: '김영희', classId: 'class-3-1', className: '3학년 1반', grade: 3, studentNumber: '20230002', parentContact: '010-2345-6789', unexcusedCount: 1 },
+                    { id: '3', name: '박철수', classId: 'class-3-1', className: '3학년 1반', grade: 3, studentNumber: '20230003', parentContact: '010-3456-7890', unexcusedCount: 0 },
+                    // 2반
+                    { id: '4', name: '이민정', classId: 'class-3-2', className: '3학년 2반', grade: 3, studentNumber: '20230004', parentContact: '010-4567-8901', unexcusedCount: 2 },
+                    { id: '5', name: '정수연', classId: 'class-3-2', className: '3학년 2반', grade: 3, studentNumber: '20230005', parentContact: '010-5678-9012', unexcusedCount: 0 },
+                    { id: '6', name: '최민호', classId: 'class-3-2', className: '3학년 2반', grade: 3, studentNumber: '20230006', parentContact: '010-6789-0123', unexcusedCount: 1 },
+                    // 3반
+                    { id: '7', name: '강지우', classId: 'class-3-3', className: '3학년 3반', grade: 3, studentNumber: '20230007', parentContact: '010-7890-1234', unexcusedCount: 0 },
+                    { id: '8', name: '윤서진', classId: 'class-3-3', className: '3학년 3반', grade: 3, studentNumber: '20230008', parentContact: '010-8901-2345', unexcusedCount: 3 },
+                    // 4반
+                    { id: '9', name: '조현우', classId: 'class-3-4', className: '3학년 4반', grade: 3, studentNumber: '20230009', parentContact: '010-9012-3456', unexcusedCount: 1 },
+                    { id: '10', name: '신예은', classId: 'class-3-4', className: '3학년 4반', grade: 3, studentNumber: '20230010', parentContact: '010-0123-4567', unexcusedCount: 0 },
+                    // 5반
+                    { id: '11', name: '임태준', classId: 'class-3-5', className: '3학년 5반', grade: 3, studentNumber: '20230011', parentContact: '010-1234-5679', unexcusedCount: 2 },
+                    { id: '12', name: '한소영', classId: 'class-3-5', className: '3학년 5반', grade: 3, studentNumber: '20230012', parentContact: '010-2345-6780', unexcusedCount: 0 },
+                    // 6반
+                    { id: '13', name: '오진혁', classId: 'class-3-6', className: '3학년 6반', grade: 3, studentNumber: '20230013', parentContact: '010-3456-7891', unexcusedCount: 1 },
+                    { id: '14', name: '배하늘', classId: 'class-3-6', className: '3학년 6반', grade: 3, studentNumber: '20230014', parentContact: '010-4567-8902', unexcusedCount: 4 },
+                    // 7반
+                    { id: '15', name: '송민재', classId: 'class-3-7', className: '3학년 7반', grade: 3, studentNumber: '20230015', parentContact: '010-5678-9013', unexcusedCount: 0 },
+                    { id: '16', name: '노유진', classId: 'class-3-7', className: '3학년 7반', grade: 3, studentNumber: '20230016', parentContact: '010-6789-0124', unexcusedCount: 2 },
+                    // 8반
+                    { id: '17', name: '유동현', classId: 'class-3-8', className: '3학년 8반', grade: 3, studentNumber: '20230017', parentContact: '010-7890-1235', unexcusedCount: 1 },
+                    { id: '18', name: '서채원', classId: 'class-3-8', className: '3학년 8반', grade: 3, studentNumber: '20230018', parentContact: '010-8901-2346', unexcusedCount: 0 },
+                    // 9반
+                    { id: '19', name: '김도윤', classId: 'class-3-9', className: '3학년 9반', grade: 3, studentNumber: '20230019', parentContact: '010-9012-3457', unexcusedCount: 3 },
+                    { id: '20', name: '이시은', classId: 'class-3-9', className: '3학년 9반', grade: 3, studentNumber: '20230020', parentContact: '010-0123-4568', unexcusedCount: 1 },
+                    // 10반
+                    { id: '21', name: '박준서', classId: 'class-3-10', className: '3학년 10반', grade: 3, studentNumber: '20230021', parentContact: '010-1234-5680', unexcusedCount: 0 },
+                    { id: '22', name: '정다은', classId: 'class-3-10', className: '3학년 10반', grade: 3, studentNumber: '20230022', parentContact: '010-2345-6781', unexcusedCount: 5 }
                 ];
 
                 this.attendance = [
-                    { id: '1', studentId: '1', date: '2024-01-15', status: 'present' },
-                    { id: '2', studentId: '2', date: '2024-01-15', status: 'present' },
-                    { id: '3', studentId: '3', date: '2024-01-15', status: 'late' },
-                    { id: '4', studentId: '4', date: '2024-01-15', status: 'absent' }
+                    { id: '1', studentId: '1', date: '2024-01-15', status: 'present', reason: '' },
+                    { id: '2', studentId: '2', date: '2024-01-15', status: 'unexcused', reason: '무단결석' },
+                    { id: '3', studentId: '3', date: '2024-01-15', status: 'late', reason: '' },
+                    { id: '4', studentId: '4', date: '2024-01-15', status: 'absent', reason: '질병' },
+                    { id: '5', studentId: '5', date: '2024-01-15', status: 'present', reason: '' },
+                    { id: '6', studentId: '6', date: '2024-01-15', status: 'unexcused', reason: '무단지각' },
+                    { id: '7', studentId: '7', date: '2024-01-15', status: 'present', reason: '' },
+                    { id: '8', studentId: '8', date: '2024-01-15', status: 'unexcused', reason: '무단결석' },
+                    { id: '9', studentId: '9', date: '2024-01-15', status: 'present', reason: '' },
+                    { id: '10', studentId: '10', date: '2024-01-15', status: 'present', reason: '' },
+                    { id: '11', studentId: '11', date: '2024-01-15', status: 'unexcused', reason: '무단결석' },
+                    { id: '12', studentId: '12', date: '2024-01-15', status: 'present', reason: '' },
+                    { id: '13', studentId: '13', date: '2024-01-15', status: 'late', reason: '' },
+                    { id: '14', studentId: '14', date: '2024-01-15', status: 'unexcused', reason: '무단결석' },
+                    { id: '15', studentId: '15', date: '2024-01-15', status: 'present', reason: '' },
+                    { id: '16', studentId: '16', date: '2024-01-15', status: 'unexcused', reason: '무단결석' },
+                    { id: '17', studentId: '17', date: '2024-01-15', status: 'present', reason: '' },
+                    { id: '18', studentId: '18', date: '2024-01-15', status: 'present', reason: '' },
+                    { id: '19', studentId: '19', date: '2024-01-15', status: 'unexcused', reason: '무단결석' },
+                    { id: '20', studentId: '20', date: '2024-01-15', status: 'present', reason: '' },
+                    { id: '21', studentId: '21', date: '2024-01-15', status: 'present', reason: '' },
+                    { id: '22', studentId: '22', date: '2024-01-15', status: 'unexcused', reason: '무단결석' }
                 ];
 
                 this.weeklyPlans = {
@@ -712,9 +872,61 @@
                     setTimeout(() => {
                         const teachers = [
                             { id: 'teacher1', name: '박담임', className: '3학년 1반' },
-                            { id: 'teacher2', name: '이담임', className: '3학년 2반' }
+                            { id: 'teacher2', name: '이담임', className: '3학년 2반' },
+                            { id: 'teacher3', name: '김담임', className: '3학년 3반' },
+                            { id: 'teacher4', name: '최담임', className: '3학년 4반' },
+                            { id: 'teacher5', name: '정담임', className: '3학년 5반' },
+                            { id: 'teacher6', name: '강담임', className: '3학년 6반' },
+                            { id: 'teacher7', name: '조담임', className: '3학년 7반' },
+                            { id: 'teacher8', name: '윤담임', className: '3학년 8반' },
+                            { id: 'teacher9', name: '한담임', className: '3학년 9반' },
+                            { id: 'teacher10', name: '오담임', className: '3학년 10반' }
                         ];
                         resolve(teachers);
+                    }, 500);
+                });
+            }
+
+            async updateAttendance(attendanceId, status, reason) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const attendance = this.attendance.find(a => a.id === attendanceId);
+                        if (attendance) {
+                            attendance.status = status;
+                            attendance.reason = reason || '';
+
+                            // 미인정 결석인 경우 카운트 증가
+                            if (status === 'unexcused') {
+                                const student = this.students.find(s => s.id === attendance.studentId);
+                                if (student) {
+                                    student.unexcusedCount = (student.unexcusedCount || 0) + 1;
+                                }
+                            }
+                        }
+                        resolve(true);
+                    }, 500);
+                });
+            }
+
+            async addUnexcusedRecord(studentId, date, reason) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const newRecord = {
+                            id: Date.now().toString(),
+                            studentId,
+                            date,
+                            status: 'unexcused',
+                            reason: reason || '무단결석'
+                        };
+                        this.attendance.push(newRecord);
+
+                        // 학생 미인정 카운트 증가
+                        const student = this.students.find(s => s.id === studentId);
+                        if (student) {
+                            student.unexcusedCount = (student.unexcusedCount || 0) + 1;
+                        }
+
+                        resolve(newRecord);
                     }, 500);
                 });
             }
@@ -876,8 +1088,8 @@
                         <div style={{ marginTop: '2rem', padding: '1rem', background: '#f5f5f5', borderRadius: '4px' }}>
                             <p style={{ margin: 0, fontWeight: '600', marginBottom: '0.5rem' }}>테스트 계정:</p>
                             <p style={{ margin: 0, fontSize: '0.875rem' }}>관리자: admin@school.edu</p>
-                            <p style={{ margin: 0, fontSize: '0.875rem' }}>담임교사1: homeroom1@school.edu</p>
-                            <p style={{ margin: 0, fontSize: '0.875rem' }}>담임교사2: homeroom2@school.edu</p>
+                            <p style={{ margin: 0, fontSize: '0.875rem' }}>담임교사 (1~10반): homeroom1@school.edu ~ homeroom10@school.edu</p>
+                            <p style={{ margin: 0, fontSize: '0.875rem' }}>예: homeroom1@school.edu (3학년 1반), homeroom5@school.edu (3학년 5반)</p>
                             <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.875rem', color: '#666' }}>비밀번호는 아무거나 입력하세요</p>
                         </div>
                     </form>
@@ -1178,6 +1390,10 @@
             const [attendance, setAttendance] = useState([]);
             const [students, setStudents] = useState([]);
             const [loading, setLoading] = useState(true);
+            const [showUnexcusedForm, setShowUnexcusedForm] = useState(false);
+            const [selectedStudent, setSelectedStudent] = useState('');
+            const [unexcusedReason, setUnexcusedReason] = useState('');
+            const [message, setMessage] = useState('');
 
             const dataService = new DataService();
 
@@ -1196,7 +1412,7 @@
                     // 출석 데이터와 학생 데이터 결합
                     const combinedData = attendanceData.map(a => {
                         const student = studentsData.find(s => s.id === a.studentId);
-                        return { ...a, studentName: student?.name || '알 수 없음' };
+                        return { ...a, studentName: student?.name || '알 수 없음', student };
                     });
 
                     setAttendance(combinedData);
@@ -1213,7 +1429,8 @@
                     'present': '출석',
                     'absent': '결석',
                     'late': '지각',
-                    'early_leave': '조퇴'
+                    'early_leave': '조퇴',
+                    'unexcused': '미인정'
                 };
                 return statusMap[status] || status;
             };
@@ -1223,9 +1440,30 @@
                     'present': 'status-present',
                     'absent': 'status-absent',
                     'late': 'status-late',
-                    'early_leave': 'status-late'
+                    'early_leave': 'status-late',
+                    'unexcused': 'status-unexcused'
                 };
                 return classMap[status] || '';
+            };
+
+            const handleAddUnexcused = async () => {
+                if (!selectedStudent || !unexcusedReason) {
+                    setMessage('학생과 사유를 모두 입력해주세요.');
+                    return;
+                }
+
+                try {
+                    await dataService.addUnexcusedRecord(selectedStudent, '2024-01-15', unexcusedReason);
+                    setMessage('미인정 기록이 추가되었습니다.');
+                    setShowUnexcusedForm(false);
+                    setSelectedStudent('');
+                    setUnexcusedReason('');
+                    loadData(); // 데이터 다시 로드
+                    setTimeout(() => setMessage(''), 3000);
+                } catch (error) {
+                    setMessage('기록 추가 중 오류가 발생했습니다.');
+                    console.error(error);
+                }
             };
 
             const canManageAttendance = checkPermission(Permission.MANAGE_ATTENDANCE).allowed;
@@ -1239,11 +1477,67 @@
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                         <h2 style={{ margin: 0, color: '#333' }}>출석 관리</h2>
                         {canManageAttendance && (
-                            <button className="btn" style={{ width: 'auto', padding: '0.5rem 1rem' }}>
-                                출석 체크
-                            </button>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <button
+                                    className="btn"
+                                    style={{ width: 'auto', padding: '0.5rem 1rem', background: '#f44336' }}
+                                    onClick={() => setShowUnexcusedForm(!showUnexcusedForm)}
+                                >
+                                    미인정 기록
+                                </button>
+                                <button className="btn" style={{ width: 'auto', padding: '0.5rem 1rem' }}>
+                                    출석 체크
+                                </button>
+                            </div>
                         )}
                     </div>
+
+                    {message && (
+                        <div className={message.includes('오류') ? 'error-message' : 'success-message'}>
+                            {message}
+                        </div>
+                    )}
+
+                    {showUnexcusedForm && canManageAttendance && (
+                        <div className="unexcused-form">
+                            <h4 style={{ margin: '0 0 1rem 0', color: '#f57c00' }}>🚨 미인정 기록 추가</h4>
+                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'end' }}>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>학생 선택</label>
+                                    <select
+                                        className="form-input"
+                                        value={selectedStudent}
+                                        onChange={(e) => setSelectedStudent(e.target.value)}
+                                    >
+                                        <option value="">학생을 선택하세요</option>
+                                        {students.map(student => (
+                                            <option key={student.id} value={student.id}>
+                                                {student.name} ({student.className})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>미인정 사유</label>
+                                    <input
+                                        className="form-input"
+                                        value={unexcusedReason}
+                                        onChange={(e) => setUnexcusedReason(e.target.value)}
+                                        placeholder="예: 무단결석, 무단지각 등"
+                                    />
+                                </div>
+                                <div>
+                                    <button
+                                        className="btn"
+                                        style={{ width: 'auto', padding: '0.5rem 1rem', background: '#f44336' }}
+                                        onClick={handleAddUnexcused}
+                                    >
+                                        기록 추가
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="card">
                         <div className="card-title">오늘의 출석 현황 (2024-01-15)</div>
@@ -1251,7 +1545,10 @@
                             <thead>
                                 <tr>
                                     <th>학생명</th>
+                                    <th>학급</th>
                                     <th>출석 상태</th>
+                                    <th>사유</th>
+                                    <th>미인정 누적</th>
                                     <th>날짜</th>
                                     {canManageAttendance && <th>작업</th>}
                                 </tr>
@@ -1260,10 +1557,19 @@
                                 {attendance.map(record => (
                                     <tr key={record.id}>
                                         <td>{record.studentName}</td>
+                                        <td>{record.student?.className || '-'}</td>
                                         <td>
                                             <span className={`status-badge ${getStatusClass(record.status)}`}>
                                                 {getStatusText(record.status)}
                                             </span>
+                                        </td>
+                                        <td>{record.reason || '-'}</td>
+                                        <td>
+                                            {record.student?.unexcusedCount > 0 ? (
+                                                <span className="unexcused-count">
+                                                    {record.student.unexcusedCount}회
+                                                </span>
+                                            ) : '-'}
                                         </td>
                                         <td>{record.date}</td>
                                         {canManageAttendance && (
@@ -1286,6 +1592,36 @@
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+
+                    {/* 미인정 다발 학생 알림 */}
+                    <div className="card">
+                        <div className="card-title">⚠️ 미인정 다발 학생</div>
+                        <div>
+                            {students.filter(s => s.unexcusedCount >= 3).length > 0 ? (
+                                <div>
+                                    {students.filter(s => s.unexcusedCount >= 3).map(student => (
+                                        <div key={student.id} style={{
+                                            background: '#ffebee',
+                                            padding: '1rem',
+                                            margin: '0.5rem 0',
+                                            borderRadius: '4px',
+                                            border: '1px solid #f44336'
+                                        }}>
+                                            <strong>{student.name}</strong> ({student.className}) -
+                                            <span className="unexcused-count" style={{ marginLeft: '0.5rem' }}>
+                                                미인정 {student.unexcusedCount}회
+                                            </span>
+                                            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.875rem', color: '#666' }}>
+                                                학부모 상담 필요 (연락처: {student.parentContact})
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p style={{ color: '#666' }}>미인정 3회 이상 학생이 없습니다.</p>
+                            )}
+                        </div>
                     </div>
                 </div>
             );
