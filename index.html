@@ -1340,7 +1340,7 @@
                 { id: 'dashboard', name: '대시보드', icon: '📊' },
                 { id: 'students', name: '학생 관리', icon: '👥', permission: 'Students' },
                 { id: 'attendance', name: '출석 관리', icon: '📅', permission: 'Attendance' },
-                { id: 'life-guidance', name: '생활지도', icon: '⚖️', permission: 'LifeGuidance' },
+                { id: 'life-guidance', name: user?.role === UserRole.ADMIN ? '생활지도 관리' : '생활지도', icon: '⚖️', permission: 'LifeGuidance' },
                 { id: 'reports', name: '보고서', icon: '📋', permission: 'Reports' },
                 { id: 'weekly-plans', name: '주간계획', icon: '📅', permission: 'WeeklyPlans', adminOnly: true },
                 { id: 'chat', name: '채팅', icon: '💬', permission: 'Chat' }
@@ -1853,6 +1853,15 @@
                 pending: 0,
                 severe: 0
             });
+            const [selectedClass, setSelectedClass] = useState('');
+            const [selectedSeverity, setSelectedSeverity] = useState('');
+            const [selectedStatus, setSelectedStatus] = useState('');
+
+            // 관리자용 반 목록
+            const classList = [
+                '3학년 1반', '3학년 2반', '3학년 3반', '3학년 4반', '3학년 5반',
+                '3학년 6반', '3학년 7반', '3학년 8반', '3학년 9반', '3학년 10반'
+            ];
 
             const dataService = new DataService();
 
@@ -1955,6 +1964,15 @@
                 return classMap[severity] || 'severity-minor';
             };
 
+            // 관리자용 필터링
+            const filteredRecords = records.filter(record => {
+                if (selectedClass && record.student?.className !== selectedClass) return false;
+                if (selectedSeverity && record.severity !== selectedSeverity) return false;
+                if (selectedStatus === '해결' && !record.resolved) return false;
+                if (selectedStatus === '미해결' && record.resolved) return false;
+                return true;
+            });
+
             const canManageGuidance = checkPermission(Permission.MANAGE_LIFE_GUIDANCE).allowed;
 
             if (loading) {
@@ -1964,9 +1982,14 @@
             return (
                 <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                        <h2 style={{ margin: 0, color: '#333' }}>
-                            생활지도 기록 {user?.role === UserRole.ADMIN ? '(전체)' : `(${user?.className})`}
-                        </h2>
+                        <div>
+                            <h2 style={{ margin: 0, color: '#333' }}>
+                                {user?.role === UserRole.ADMIN ? '생활지도 관리 시스템' : '생활지도 기록'}
+                            </h2>
+                            <p style={{ margin: '0.25rem 0 0 0', color: '#666', fontSize: '0.9rem' }}>
+                                {user?.role === UserRole.ADMIN ? '전체 학교 생활지도 현황을 확인할 수 있습니다' : `${user?.className} 생활지도 기록`}
+                            </p>
+                        </div>
                         {canManageGuidance && (
                             <button
                                 className="btn"
@@ -1982,20 +2005,28 @@
                     <div className="guidance-stats">
                         <div className="guidance-stat-card">
                             <div className="guidance-stat-number">{stats.total}</div>
-                            <div>전체 기록</div>
+                            <div>{user?.role === UserRole.ADMIN ? '전체 기록 (전교)' : '전체 기록'}</div>
                         </div>
                         <div className="guidance-stat-card">
                             <div className="guidance-stat-number">{stats.pending}</div>
-                            <div>미해결</div>
+                            <div>미해결 사건</div>
                         </div>
                         <div className="guidance-stat-card">
                             <div className="guidance-stat-number">{stats.resolved}</div>
                             <div>해결완료</div>
                         </div>
-                        <div className="guidance-stat-card">
-                            <div className="guidance-stat-number">{stats.severe}</div>
-                            <div>중대 사안</div>
+                        <div className="guidance-stat-card" style={{ borderLeftColor: stats.severe > 0 ? '#f44336' : '#9c27b0' }}>
+                            <div className="guidance-stat-number" style={{ color: stats.severe > 0 ? '#f44336' : '#9c27b0' }}>{stats.severe}</div>
+                            <div>중대 사안 {stats.severe > 0 && '⚠️'}</div>
                         </div>
+                        {user?.role === UserRole.ADMIN && (
+                            <div className="guidance-stat-card" style={{ borderLeftColor: '#ff9800' }}>
+                                <div className="guidance-stat-number" style={{ color: '#ff9800' }}>
+                                    {records.filter(r => !r.parentNotified && !r.resolved).length}
+                                </div>
+                                <div>학부모 미연락</div>
+                            </div>
+                        )}
                     </div>
 
                     {message && (
@@ -2102,14 +2133,86 @@
                         </div>
                     )}
 
+                    {/* 관리자용 필터 */}
+                    {user?.role === UserRole.ADMIN && (
+                        <div className="card" style={{ background: '#f8f9fa', border: '1px solid #e9ecef' }}>
+                            <div className="card-title">필터 및 검색</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>학급 필터</label>
+                                    <select
+                                        className="form-input"
+                                        value={selectedClass}
+                                        onChange={(e) => setSelectedClass(e.target.value)}
+                                    >
+                                        <option value="">전체 학급</option>
+                                        {classList.map(className => (
+                                            <option key={className} value={className}>{className}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>심각도 필터</label>
+                                    <select
+                                        className="form-input"
+                                        value={selectedSeverity}
+                                        onChange={(e) => setSelectedSeverity(e.target.value)}
+                                    >
+                                        <option value="">전체 심각도</option>
+                                        <option value="단순">단순</option>
+                                        <option value="경미">경미</option>
+                                        <option value="중대">중대</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>처리 상태</label>
+                                    <select
+                                        className="form-input"
+                                        value={selectedStatus}
+                                        onChange={(e) => setSelectedStatus(e.target.value)}
+                                    >
+                                        <option value="">전체 상태</option>
+                                        <option value="미해결">미해결</option>
+                                        <option value="해결">해결완료</option>
+                                    </select>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'end' }}>
+                                    <button
+                                        className="btn btn-secondary"
+                                        onClick={() => {
+                                            setSelectedClass('');
+                                            setSelectedSeverity('');
+                                            setSelectedStatus('');
+                                        }}
+                                        style={{ width: '100%', padding: '0.5rem' }}
+                                    >
+                                        필터 초기화
+                                    </button>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#666' }}>
+                                필터 결과: {filteredRecords.length}건 / 전체 {records.length}건
+                            </div>
+                        </div>
+                    )}
+
                     {/* 기록 목록 */}
                     <div className="card">
-                        <div className="card-title">생활지도 기록 목록</div>
-                        {records.length === 0 ? (
-                            <p style={{ textAlign: 'center', color: '#666', padding: '2rem' }}>아직 기록이 없습니다.</p>
+                        <div className="card-title">
+                            생활지도 기록 목록
+                            {user?.role === UserRole.ADMIN && records.length > 0 && (
+                                <span style={{ fontSize: '0.9rem', fontWeight: 'normal', color: '#666', marginLeft: '0.5rem' }}>
+                                    (표시: {filteredRecords.length}건 / 전체: {records.length}건)
+                                </span>
+                            )}
+                        </div>
+                        {filteredRecords.length === 0 ? (
+                            <p style={{ textAlign: 'center', color: '#666', padding: '2rem' }}>
+                                {records.length === 0 ? '아직 기록이 없습니다.' : '필터 조건에 맞는 기록이 없습니다.'}
+                            </p>
                         ) : (
                             <div>
-                                {records.map(record => (
+                                {filteredRecords.map(record => (
                                     <div key={record.id} style={{
                                         border: '1px solid #e0e0e0',
                                         borderRadius: '8px',
